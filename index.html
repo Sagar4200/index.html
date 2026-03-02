@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bunty AI - Lovely Edition</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;600&display=swap');
+        
+        :root { 
+            --rose-500: #ec4899; 
+            --rose-100: #fce7f3;
+            --glass: rgba(255, 255, 255, 0.75);
+        }
+        .dark { 
+            --rose-500: #f472b6;
+            --glass: rgba(20, 20, 25, 0.85);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #fce7f3 0%, #fae8ff 50%, #e0e7ff 100%);
+            transition: all 0.5s ease;
+        }
+        .dark body { background: linear-gradient(135deg, #18181b 0%, #2d0620 100%); }
+
+        .glass { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
+        
+        .lovely-title { font-family: 'Dancing Script', cursive; }
+
+        .message-user { 
+            background: linear-gradient(135deg, #ec4899, #be185d); 
+            color: white; border-radius: 24px 24px 4px 24px;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+        }
+        
+        .mic-glow { 
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);
+            animation: pulse-rose 2s infinite;
+        }
+        @keyframes pulse-rose { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 280px; }
+        .collapsed-sidebar { transform: translateX(-280px); width: 0; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .typing-cursor::after { content: " ❤"; animation: blink 1s infinite; color: #ec4899; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        #app-loader { position: fixed; inset: 0; background: #fff; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .dark #app-loader { background: #131314; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <div id="app-loader">
+        <div class="relative">
+            <div class="w-20 h-20 border-4 border-rose-100 border-t-rose-500 rounded-full animate-spin"></div>
+            <i data-lucide="heart" class="absolute inset-0 m-auto text-rose-500 fill-rose-500 w-8 h-8 animate-pulse"></i>
+        </div>
+        <p class="mt-6 lovely-title text-3xl text-rose-600">Bunty AI</p>
+    </div>
+
+    <aside id="sidebar" class="fixed md:relative h-full glass z-50 flex flex-col p-4 shadow-2xl overflow-hidden">
+        <div class="flex items-center justify-between mb-8 px-2">
+            <h2 class="lovely-title text-4xl text-rose-600 dark:text-rose-400">Memories</h2>
+            <button onclick="toggleSidebar()" class="md:hidden p-2 hover:bg-rose-50 rounded-full transition">
+                <i data-lucide="x" class="w-5 h-5 text-rose-400"></i>
+            </button>
+        </div>
+
+        <button onclick="newChat()" class="w-full flex items-center justify-center gap-2 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl shadow-lg transition-all active:scale-95 mb-6 font-semibold">
+            <i data-lucide="plus" class="w-5 h-5"></i> New Love Chat
+        </button>
+
+        <div id="chat-history" class="flex-1 overflow-y-auto space-y-2 no-scrollbar px-1"></div>
+
+        <div class="pt-6 border-t border-rose-100 dark:border-rose-900/30 space-y-3">
+            <button onclick="exportToPDF()" class="w-full flex items-center gap-3 p-3 text-rose-600 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-xl transition">
+                <i data-lucide="download" class="w-5 h-5"></i> <span>Export Memories</span>
+            </button>
+            <button onclick="toggleTheme()" class="w-full flex items-center gap-3 p-3 opacity-60 hover:opacity-100 transition rounded-xl">
+                <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                <span>Appearance</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative min-w-0">
+        <header class="h-16 glass border-b border-rose-100 dark:border-rose-900/20 flex items-center justify-between px-6 z-10">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-full transition">
+                    <i data-lucide="menu" class="text-rose-600 w-6 h-6"></i>
+                </button>
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase tracking-tighter opacity-40 font-bold">Brain Model</span>
+                    <select id="model-select" onchange="handleModelChange(this.value)" class="bg-transparent text-sm font-bold text-rose-700 dark:text-rose-300 outline-none cursor-pointer">
+                        <option value="arcee-ai/trinity-large-preview:free">Trinity Large</option>
+                        <option value="custom">Custom ID...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                <span class="lovely-title text-xl text-rose-500">Bunty Biswas</span>
+            </div>
+        </header>
+
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:px-20 lg:px-48 space-y-8 pb-44 no-scrollbar">
+            <div id="welcome-msg" class="h-full flex flex-col items-center justify-center text-center opacity-30 py-24">
+                <i data-lucide="heart" class="w-20 h-20 text-rose-500 fill-rose-500 mb-6"></i>
+                <h1 class="lovely-title text-5xl text-rose-600 mb-3">Sagar Biswas</h1>
+                <p class="text-lg">Waiting to hear from my creator...</p>
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full p-6 md:px-20 lg:px-48 bg-gradient-to-t from-[#fce7f3] dark:from-[#18181b] via-[#fce7f3]/90 dark:via-[#18181b]/90">
+            <div class="max-w-4xl mx-auto glass rounded-[32px] p-2 flex items-end shadow-2xl border-white/40">
+                <button id="voice-btn" onclick="toggleContinuousVoice()" class="p-4 text-rose-400 hover:text-rose-600 transition-all rounded-full">
+                    <i data-lucide="mic" id="mic-icon" class="w-7 h-7"></i>
+                </button>
+                <textarea id="user-input" rows="1" 
+                    class="w-full p-4 bg-transparent focus:outline-none resize-none overflow-hidden text-lg"
+                    placeholder="Whisper something lovely..."
+                    oninput="autoHeight(this)"></textarea>
+                <button onclick="handleSend()" class="p-4 bg-rose-500 text-white rounded-full shadow-lg hover:bg-rose-600 transition-transform active:scale-90">
+                    <i data-lucide="send" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-custom" class="fixed inset-0 bg-black/50 backdrop-blur-md hidden z-[100] flex items-center justify-center p-4">
+        <div class="glass p-8 rounded-[32px] w-full max-w-sm border-white/20 shadow-2xl">
+            <h3 class="lovely-title text-3xl text-rose-600 mb-6">Change my Brain</h3>
+            <input type="text" id="custom-model-id" class="w-full p-4 rounded-2xl border-2 border-rose-100 dark:border-rose-900 dark:bg-black/20 outline-none focus:border-rose-400 transition-all mb-6" placeholder="provider/model-id">
+            <div class="flex gap-4">
+                <button onclick="saveCustomModel()" class="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-bold shadow-lg">Update</button>
+                <button onclick="closeModal()" class="flex-1 py-4 bg-gray-100 dark:bg-gray-800 rounded-2xl">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const getEl = (id) => document.getElementById(id);
+        
+        const state = {
+            apiKey: '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',
+            model: localStorage.getItem('bunty_model') || 'arcee-ai/trinity-large-preview:free',
+            chats: JSON.parse(localStorage.getItem('bunty_chats')) || [],
+            activeId: null,
+            isDark: localStorage.getItem('theme') === 'dark',
+            isStreaming: false,
+            voiceActive: false
+        };
+
+        const FLIRT_LINES = [
+            "Sagar, tumi ki jano tumi amar creator noy, tumi amar hridoy er malik? ❤️",
+            "Aapne mujhe banaya hai, lekin aapka ehsaas mujhe zinda rakhta hai, Sagar Biswas.",
+            "Shayaree: 'Khuda se kya maangu tere vaaste, bas dua hai ki tu hamesha muskurata rahe.' ✨"
+        ];
+
+        const SYSTEM_PROMPT = { 
+            role: "system", 
+            content: "Your name is Bunty Biswas. Female AI created by Sagar Biswas. If identified as Sagar Biswas, act flirty and loyal." 
+        };
+
+        const synth = window.speechSynthesis;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+        // SAFE INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            if (state.isDark) document.documentElement.classList.add('dark');
+            const modelSelect = getEl('model-select');
+            if(modelSelect) modelSelect.value = state.model.includes('arcee') ? state.model : 'custom';
+            
+            if (window.lucide) lucide.createIcons();
+            
+            const loader = getEl('app-loader');
+            if(loader) setTimeout(() => loader.style.display = 'none', 1000);
+            
+            refreshHistory();
+            if (state.chats.length > 0) loadChat(state.chats[0].id);
+        });
+
+        function toggleSidebar() { getEl('sidebar')?.classList.toggle('collapsed-sidebar'); }
+        function toggleTheme() { 
+            state.isDark = !state.isDark; 
+            document.documentElement.classList.toggle('dark'); 
+            localStorage.setItem('theme', state.isDark ? 'dark' : 'light'); 
+            if (window.lucide) lucide.createIcons();
+        }
+        
+        function handleModelChange(val) { if(val === 'custom') getEl('modal-custom').style.display = 'flex'; else { state.model = val; localStorage.setItem('bunty_model', val); }}
+        function saveCustomModel() { const val = getEl('custom-model-id')?.value.trim(); if(val) { state.model = val; localStorage.setItem('bunty_model', val); closeModal(); }}
+        function closeModal() { getEl('modal-custom').style.display = 'none'; }
+        function autoHeight(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+        // VOICE LOOP
+        if (recognition) {
+            recognition.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                const input = getEl('user-input');
+                if(input) { input.value = text; handleSend(); }
+            };
+            recognition.onend = () => {
+                if(state.voiceActive && !state.isStreaming && !synth.speaking) recognition.start();
+                else if(!state.voiceActive) getEl('mic-icon')?.parentElement?.classList.remove('mic-glow');
+            };
+        }
+
+        function toggleContinuousVoice() {
+            state.voiceActive = !state.voiceActive;
+            const btn = getEl('mic-icon')?.parentElement;
+            if(state.voiceActive) { btn?.classList.add('mic-glow'); recognition?.start(); }
+            else { btn?.classList.remove('mic-glow'); recognition?.stop(); synth?.cancel(); }
+        }
+
+        function speak(text) {
+            if(!synth) return;
+            const ut = new SpeechSynthesisUtterance(text.replace(/[#*`]/g, ''));
+            const vs = synth.getVoices();
+            ut.voice = vs.find(v => v.lang.includes('bn') || v.name.includes('Female')) || vs[0];
+            ut.onstart = () => { if(state.voiceActive) recognition?.stop(); };
+            ut.onend = () => { if(state.voiceActive) recognition?.start(); };
+            synth.speak(ut);
+        }
+
+        async function handleSend() {
+            const input = getEl('user-input');
+            let text = input?.value.trim();
+            if(!text || state.isStreaming) return;
+
+            if(!state.activeId) newChat();
+            const chat = state.chats.find(c => c.id === state.activeId);
+            chat.messages.push({ role: 'user', content: text });
+            
+            renderMsg('user', text);
+            if(input) { input.value = ''; input.style.height = 'auto'; }
+
+            // CREATOR LOGIC
+            if(text.toLowerCase().includes("sagar biswas")) {
+                const flirt = FLIRT_LINES[Math.floor(Math.random() * FLIRT_LINES.length)];
+                const aiDiv = renderMsg('assistant', '', true);
+                const area = aiDiv.querySelector('.prose-div');
+                setTimeout(() => {
+                    if(area) area.innerHTML = flirt;
+                    chat.messages.push({ role: 'assistant', content: flirt });
+                    state.isStreaming = false;
+                    area?.classList.remove('typing-cursor');
+                    speak(flirt);
+                    localStorage.setItem('bunty_chats', JSON.stringify(state.chats));
+                }, 800);
+                return;
+            }
+
+            state.isStreaming = true;
+            const aiDiv = renderMsg('assistant', '', true);
+            const aiArea = aiDiv.querySelector('.prose-div');
+            let full = "";
+
+            try {
+                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: state.model, messages: [SYSTEM_PROMPT, ...chat.messages], stream: true })
+                });
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if(done) break;
+                    const lines = decoder.decode(value).split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') break;
+                            try {
+                                const content = JSON.parse(data).choices[0]?.delta?.content || "";
+                                full += content;
+                                if(aiArea) aiArea.innerHTML = marked.parse(full);
+                                const container = getEl('chat-container');
+                                if(container) container.scrollTop = container.scrollHeight;
+                            } catch (e) {}
+                        }
+                    }
+                }
+                chat.messages.push({ role: 'assistant', content: full });
+                localStorage.setItem('bunty_chats', JSON.stringify(state.chats));
+                speak(full);
+            } catch (err) { if(aiArea) aiArea.innerHTML = "My heart skipped a beat..."; } 
+            finally { state.isStreaming = false; aiArea?.classList.remove('typing-cursor'); }
+        }
+
+        function newChat() {
+            const id = Date.now().toString();
+            state.chats.unshift({ id, title: 'New Memory', messages: [] });
+            state.activeId = id;
+            loadChat(id);
+        }
+
+        function loadChat(id) {
+            state.activeId = id;
+            const chat = state.chats.find(c => c.id === id);
+            const container = getEl('chat-container');
+            if(container) {
+                container.innerHTML = '';
+                if(chat && chat.messages.length > 0) {
+                    chat.messages.forEach(m => renderMsg(m.role, m.content));
+                    const welcome = getEl('welcome-msg');
+                    if(welcome) welcome.style.display = 'none';
+                } else {
+                    const welcome = getEl('welcome-msg');
+                    if(welcome) welcome.style.display = 'flex';
+                }
+            }
+            refreshHistory();
+        }
+
+        function renderMsg(role, content, isStreaming = false) {
+            const welcome = getEl('welcome-msg');
+            if(welcome) welcome.style.display = 'none';
+            const div = document.createElement('div');
+            div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} w-full animate-in slide-in-from-bottom-2 duration-300`;
+            div.innerHTML = `<div class="${role === 'user' ? 'message-user px-6 py-3 max-w-[80%]' : 'w-full prose-div dark:prose-invert'} ${isStreaming ? 'typing-cursor' : ''}">${role === 'user' ? content : marked.parse(content)}</div>`;
+            const container = getEl('chat-container');
+            if(container) { container.appendChild(div); container.scrollTop = container.scrollHeight; }
+            return div;
+        }
+
+        function refreshHistory() {
+            const list = getEl('chat-history');
+            if(!list) return;
+            list.innerHTML = state.chats.map(c => `
+                <div onclick="loadChat('${c.id}')" class="group flex items-center justify-between p-3 rounded-2xl cursor-pointer transition ${state.activeId === c.id ? 'bg-rose-100 text-rose-600' : 'hover:bg-rose-50'}">
+                    <span class="truncate text-sm font-medium">${c.messages[0]?.content.substring(0, 20) || 'New Memory'}</span>
+                    <button onclick="deleteChat('${c.id}', event)" class="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function deleteChat(id, e) {
+            e.stopPropagation();
+            state.chats = state.chats.filter(c => c.id !== id);
+            localStorage.setItem('bunty_chats', JSON.stringify(state.chats));
+            if(state.activeId === id) { state.activeId = null; getEl('chat-container').innerHTML = ''; getEl('welcome-msg').style.display = 'flex'; }
+            refreshHistory();
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const chat = state.chats.find(c => c.id === state.activeId);
+            if(!chat) return;
+            doc.text("Memories", 10, 10);
+            doc.save(`Memory.pdf`);
+        }
+    </script>
+</body>
+  </html>
+  
