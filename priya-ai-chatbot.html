@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ultimate Love Quest For Pallabi 💖</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #2b0826 0%, #681137 50%, #b81734 100%);
+      color: #fff;
+      overflow-x: hidden;
+      padding: 15px;
+      position: relative;
+    }
+
+    #particleCanvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Floating Music Toggle */
+    .music-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50px;
+      padding: 8px 16px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
+    /* Main Glass Card */
+    .card {
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 26px 20px;
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+      position: relative;
+      z-index: 10;
+      margin: 20px 0;
+    }
+
+    .step {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .step.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #ff9ebb;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    p {
+      font-size: 14px;
+      opacity: 0.95;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    /* Step 1: Scratch Card */
+    .scratch-container {
+      position: relative;
+      width: 270px;
+      height: 130px;
+      margin: 10px 0;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .scratch-secret {
+      position: absolute;
+      inset: 0;
+      background: #ff3366;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      color: #fff;
+    }
+
+    #scratchCanvas {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    /* Step 2: Quiz */
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .quiz-btn {
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 14px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quiz-btn:hover { background: rgba(255, 255, 255, 0.35); }
+
+    /* Step 3: Arcade Canvas */
+    #gameCanvas {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      touch-action: none;
+    }
+
+    /* Step 4: Vibe Selection */
+    .option-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .select-card {
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    /* Step 5: Photo Frame Showcase & Love Note */
+    .photo-showcase {
+      position: relative;
+      width: 200px;
+      height: 240px;
+      margin: 0 auto 15px;
+      border-radius: 24px;
+      padding: 7px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.3));
+      box-shadow: 0 18px 40px rgba(255, 8, 68, 0.4);
+    }
+
+    .photo-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .photo-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .photo-badge {
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: #ff0844;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 5px 14px;
+      border-radius: 30px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      white-space: nowrap;
+    }
+
+    .compliment-trigger {
+      background: rgba(255, 255, 255, 0.9);
+      color: #ff0844;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+    }
+
+    .compliment-box {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px dashed rgba(255, 255, 255, 0.6);
+      border-radius: 14px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      min-height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+
+    .typewriter-box {
+      font-size: 13px;
+      font-style: italic;
+      min-height: 50px;
+      color: #fff;
+      margin-bottom: 15px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 12px;
+      border-radius: 12px;
+      width: 100%;
+      line-height: 1.5;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      box-sizing: border-box;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      min-height: 50px;
+      width: 100%;
+      position: relative;
+    }
+
+    .action-btn {
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Keyframe Animations */
+    @keyframes pulseGlow {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.7);
+      }
+      50% {
+        transform: scale(1.08);
+        box-shadow: 0 0 18px 6px rgba(56, 239, 125, 0.8);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(56, 239, 125, 0);
+      }
+    }
+
+    @keyframes shakeWobble {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      20% { transform: scale(1.05) rotate(-3deg); }
+      40% { transform: scale(1.05) rotate(3deg); }
+      60% { transform: scale(1.05) rotate(-3deg); }
+      80% { transform: scale(1.05) rotate(3deg); }
+    }
+
+    #yesBtn {
+      background: #38ef7d;
+      color: #0d4722;
+      animation: pulseGlow 1.5s infinite ease-in-out;
+    }
+
+    #noBtn {
+      background: #ffffff;
+      color: #ff0844;
+      position: absolute;
+      transition: top 0.2s ease-out, left 0.2s ease-out;
+      animation: shakeWobble 2s infinite ease-in-out;
+    }
+
+    /* Step 6: VIP Ticket Voucher */
+    .ticket-card {
+      background: #ffffff;
+      color: #222;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .ticket-header {
+      color: #ff0844;
+      font-size: 17px;
+      font-weight: 800;
+      border-bottom: 2px dashed #ffb199;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .ticket-row {
+      margin-bottom: 8px;
+      font-size: 13.5px;
+    }
+
+    .wa-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: #25D366;
+      color: white;
+      text-decoration: none;
+      padding: 13px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 15px;
+      margin-top: 15px;
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    }
+
+    .next-btn {
+      margin-top: 15px;
+      padding: 10px 24px;
+      background: linear-gradient(90deg, #ff758c, #ff7eb3);
+      border: none;
+      border-radius: 30px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particleCanvas"></canvas>
+
+  <button class="music-btn" id="musicToggle">🔊 Music On</button>
+  <audio id="bgMusic" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3"></audio>
+
+  <div class="card">
+    <!-- QUEST 1: Scratch Card -->
+    <div class="step active" id="step1">
+      <h2>Quest 1: Scratch To Reveal 🪄</h2>
+      <p>Pallabi, rub the silver layer to unlock Sagar's hidden secret!</p>
+      
+      <div class="scratch-container">
+        <div class="scratch-secret">
+          "Pallabi, Sagar thinks you have the most beautiful smile in the whole world! ✨"
+        </div>
+        <canvas id="scratchCanvas" width="270" height="130"></canvas>
+      </div>
+
+      <button class="next-btn" id="next1" style="display:none;" onclick="goToStep(2)">Next Quest 🚀</button>
+    </div>
+
+    <!-- QUEST 2: Quiz -->
+    <div class="step" id="step2">
+      <h2>Quest 2: Sagar's Ultimate Quiz 🧠</h2>
+      <p>Who is Sagar's most favorite person to talk to all day?</p>
+      
+      <div class="quiz-options">
+        <button class="quiz-btn" onclick="answerQuiz()">A) Pallabi 💖</button>
+        <button class="quiz-btn" onclick="answerQuiz()">B) Obviously Pallabi 🥰</button>
+        <button class="quiz-btn" onclick="answerQuiz()">C) Undoubtedly Pallabi 👑</button>
+      </div>
+      <p id="quizFeedback" style="margin-top: 12px; font-weight: bold; color: #38ef7d;"></p>
+    </div>
+
+    <!-- QUEST 3: Heart Catcher Arcade -->
+    <div class="step" id="step3">
+      <h2>Quest 3: Catch The Hearts 🎮</h2>
+      <p>Move the basket to catch 5 hearts for Sagar!</p>
+      
+      <canvas id="gameCanvas" width="270" height="200"></canvas>
+      <div style="margin-top: 8px; font-weight: bold;" id="gameScore">Score: 0 / 5</div>
+    </div>
+
+    <!-- QUEST 4: Vibe Selector -->
+    <div class="step" id="step4">
+      <h2>Quest 4: Choose Our Vibe ☕</h2>
+      <p>Pallabi, where should Sagar take you first?</p>
+      <div class="option-cards">
+        <div class="select-card" onclick="selectDate('Sunset Walk & Coffee 🌅')">
+          <span style="font-size:24px;">🌅</span>
+          <div><b>Sunset Walk & Coffee</b><br><small>Peaceful talk & aesthetic vibes</small></div>
+        </div>
+        <div class="select-card" onclick="selectDate('Late Night Bike Drive 🛵')">
+          <span style="font-size:24px;">🛵</span>
+          <div><b>Late Night Ride</b><br><small>Cool breeze & favorite music</small></div>
+        </div>
+        <div class="select-card" onclick="selectDate('Foodie Street Date 🍕')">
+          <span style="font-size:24px;">🍕</span>
+          <div><b>Street Food Hop</b><br><small>Phuchka, Momos & endless laughs</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUEST 5: Proposal & Photo Showcase Card -->
+    <div class="step" id="step5">
+      <div class="photo-showcase">
+        <div class="photo-inner">
+          <img src="https://i.ibb.co/Q35Pz8Yb/1788142625164.jpg" alt="Pallabi">
+        </div>
+        <div class="photo-badge">👑 Pallabi - Queen of Sagar's Heart ✨</div>
+      </div>
+
+      <button class="compliment-trigger" onclick="nextCompliment()">✨ Tap for Secret Compliment ✨</button>
+      <div class="compliment-box" id="complimentText">Pallabi, you are Sagar's ultimate crush! 🙈💖</div>
+
+      <div class="typewriter-box" id="typewriter"></div>
+
+      <h2 style="font-size: 18px; margin-bottom: 12px;">Pallabi, will you go on a date with Sagar? 🙈</h2>
+
+      <div class="btn-group">
+        <button class="action-btn" id="yesBtn">YES! 💖</button>
+        <button class="action-btn" id="noBtn">NO 😜</button>
+      </div>
+    </div>
+
+    <!-- QUEST 6: Final Ticket Voucher -->
+    <div class="step" id="step6">
+      <h2>IT'S A MATCH! 🎉✨</h2>
+      <p>VIP Date Pass Unlocked! 🎟️</p>
+
+      <div class="ticket-card">
+        <div class="ticket-header">OFFICIAL DATE PASS: SAGAR & PALLABI 💖</div>
+        <div class="ticket-row"><b>Chosen Vibe:</b> <span id="chosenVibe" style="color:#ff0844;">Sunset Walk</span></div>
+        <div class="ticket-row"><b>Status:</b> Confirmed & Reserved 🔒</div>
+        <div class="ticket-row"><b>Message:</b> "To the most gorgeous Pallabi... Sagar is waiting for you! ✨"</div>
+
+        <a href="#" id="whatsappLink" target="_blank" class="wa-btn">📲 Confirm via WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedVibeOption = "Sunset Walk & Coffee 🌅";
+    let dodgeCount = 0;
+    let isMusicPlaying = false;
+    let complimentIndex = 0;
+
+    const targetPhoneNumber = "919641516427"; // Sagar's contact number
+
+    const compliments = [
+      "Pallabi, you are Sagar's ultimate crush! 🙈💖",
+      "Honestly Pallabi, you are insanely gorgeous and your smile is pure magic! ✨",
+      "Pallabi, you have the prettiest eyes that make Sagar's heart skip a beat! 💓",
+      "You're not just gorgeous Pallabi, you're 100% sunshine! 🌸",
+      "Sagar can't stop thinking about how cute you look every day! 🙈"
+    ];
+
+    const noTexts = ["NO 😜", "Are you sure?", "Think again! 🤐", "Wrong button!", "Nice try bro 🏃‍♂️", "Catch me! 💨"];
+    
+    const loveNote = "Hey Pallabi, from the very first day, you became Sagar's favorite thought. You are truly the most beautiful person inside out... ✨";
+
+    const musicBtn = document.getElementById('musicToggle');
+    const bgMusic = document.getElementById('bgMusic');
+
+    function startAudio() {
+      if (!isMusicPlaying) {
+        bgMusic.play().then(() => {
+          isMusicPlaying = true;
+          musicBtn.innerText = "🔊 Mute Music";
+        }).catch(() => {});
+      }
+    }
+
+    ['click', 'touchstart', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, () => startAudio(), { once: true });
+    });
+
+    musicBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (bgMusic.paused) {
+        bgMusic.play();
+        isMusicPlaying = true;
+        musicBtn.innerText = "🔊 Mute Music";
+      } else {
+        bgMusic.pause();
+        isMusicPlaying = false;
+        musicBtn.innerText = "🎵 Music On";
+      }
+    });
+
+    function goToStep(stepNum) {
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      document.getElementById(`step${stepNum}`).classList.add('active');
+      
+      if (stepNum === 3) initCatchGame();
+      if (stepNum === 5) startTypewriter();
+    }
+
+    /* --- STEP 1: Scratch Canvas Logic --- */
+    const sCanvas = document.getElementById('scratchCanvas');
+    const sCtx = sCanvas.getContext('2d');
+    let isDrawing = false;
+    let clearedPixels = 0;
+
+    sCtx.fillStyle = '#b2bec3';
+    sCtx.fillRect(0, 0, sCanvas.width, sCanvas.height);
+    sCtx.fillStyle = '#636e72';
+    sCtx.font = '14px Poppins';
+    sCtx.textAlign = 'center';
+    sCtx.fillText('✨ Scratch Here Pallabi ✨', 135, 70);
+
+    function scratch(e) {
+      if (!isDrawing) return;
+      const rect = sCanvas.getBoundingClientRect();
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.beginPath();
+      sCtx.arc(x, y, 18, 0, Math.PI * 2);
+      sCtx.fill();
+
+      clearedPixels++;
+      if (clearedPixels > 30) {
+        document.getElementById('next1').style.display = 'inline-block';
+      }
+    }
+
+    sCanvas.addEventListener('mousedown', () => isDrawing = true);
+    sCanvas.addEventListener('mouseup', () => isDrawing = false);
+    sCanvas.addEventListener('mousemove', scratch);
+    sCanvas.addEventListener('touchstart', () => isDrawing = true);
+    sCanvas.addEventListener('touchend', () => isDrawing = false);
+    sCanvas.addEventListener('touchmove', scratch);
+
+    /* --- STEP 2: Quiz Logic --- */
+    function answerQuiz() {
+      document.getElementById('quizFeedback').innerText = "Correct answer! 100% Match with Sagar! 😍";
+      setTimeout(() => goToStep(3), 1100);
+    }
+
+    /* --- STEP 3: Arcade Game Logic --- */
+    function initCatchGame() {
+      const gCanvas = document.getElementById('gameCanvas');
+      const gCtx = gCanvas.getContext('2d');
+      let basketX = 105;
+      const basketWidth = 60;
+      let score = 0;
+      let hearts = [];
+
+      function spawnHeart() {
+        hearts.push({
+          x: Math.random() * (gCanvas.width - 20) + 10,
+          y: 0,
+          speed: Math.random() * 1.5 + 1.5
+        });
+      }
+
+      function updateGame() {
+        gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+
+        gCtx.fillStyle = '#ff758c';
+        gCtx.fillRect(basketX, gCanvas.height - 18, basketWidth, 10);
+
+        if (Math.random() < 0.035 && hearts.length < 3) spawnHeart();
+
+        for (let i = 0; i < hearts.length; i++) {
+          let h = hearts[i];
+          h.y += h.speed;
+
+          gCtx.font = '16px serif';
+          gCtx.fillText('❤️', h.x, h.y);
+
+          if (h.y >= gCanvas.height - 22 && h.x >= basketX - 10 && h.x <= basketX + basketWidth) {
+            hearts.splice(i, 1);
+            score++;
+            document.getElementById('gameScore').innerText = `Score: ${score} / 5`;
+            if (score >= 5) {
+              setTimeout(() => goToStep(4), 400);
+              return;
+            }
+          } else if (h.y > gCanvas.height) {
+            hearts.splice(i, 1);
+          }
+        }
+
+        if (score < 5) requestAnimationFrame(updateGame);
+      }
+
+      function moveBasket(e) {
+        const rect = gCanvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        if (clientX) {
+          basketX = clientX - rect.left - basketWidth / 2;
+          if (basketX < 0) basketX = 0;
+          if (basketX > gCanvas.width - basketWidth) basketX = gCanvas.width - basketWidth;
+        }
+      }
+
+      gCanvas.addEventListener('mousemove', moveBasket);
+      gCanvas.addEventListener('touchmove', moveBasket);
+
+      requestAnimationFrame(updateGame);
+    }
+
+    /* --- STEP 4: Vibe Selector --- */
+    function selectDate(vibe) {
+      selectedVibeOption = vibe;
+      goToStep(5);
+    }
+
+    /* --- STEP 5: Compliment & Typewriter --- */
+    function nextCompliment() {
+      complimentIndex = (complimentIndex + 1) % compliments.length;
+      const box = document.getElementById('complimentText');
+      box.style.opacity = '0';
+      setTimeout(() => {
+        box.innerText = compliments[complimentIndex];
+        box.style.opacity = '1';
+      }, 150);
+    }
+
+    function startTypewriter() {
+      let i = 0;
+      const box = document.getElementById('typewriter');
+      box.innerText = "";
+      const timer = setInterval(() => {
+        if (i < loveNote.length) {
+          box.innerText += loveNote.charAt(i);
+          i++;
+        } else {
+          clearInterval(timer);
+        }
+      }, 45);
+    }
+
+    /* Moving NO Button */
+    const noBtn = document.getElementById('noBtn');
+    function moveNoButton() {
+      dodgeCount = (dodgeCount + 1) % noTexts.length;
+      noBtn.innerText = noTexts[dodgeCount];
+
+      const maxX = window.innerWidth - noBtn.offsetWidth - 30;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 30;
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = `${Math.max(20, Math.floor(Math.random() * maxX))}px`;
+      noBtn.style.top = `${Math.max(20, Math.floor(Math.random() * maxY))}px`;
+    }
+
+    noBtn.addEventListener('mouseover', moveNoButton);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
+
+    /* YES Button Click */
+    document.getElementById('yesBtn').addEventListener('click', () => {
+      document.getElementById('chosenVibe').innerText = selectedVibeOption;
+      
+      const textMessage = `Hey Sagar! I cleared all your quests! 🙈💖 My choice for our date: ${selectedVibeOption}. Let's plan it, Sagar! ✨`;
+      const encodedMsg = encodeURIComponent(textMessage);
+      
+      document.getElementById('whatsappLink').href = `https://api.whatsapp.com/send?phone=${targetPhoneNumber}&text=${encodedMsg}`;
+
+      goToStep(6);
+      triggerConfetti();
+    });
+
+    /* --- PARTICLE CANVAS BACKGROUND & CONFETTI --- */
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor(isConfetti = false) {
+        this.isConfetti = isConfetti;
+        this.x = Math.random() * canvas.width;
+        this.y = isConfetti ? -10 : Math.random() * canvas.height;
+        this.size = Math.random() * 6 + 3;
+        this.speedY = isConfetti ? Math.random() * 3 + 2 : Math.random() * -1 - 0.5;
+        this.speedX = Math.random() * 2 - 1;
+        this.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
+      }
+
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        if (this.y > canvas.height && this.isConfetti) this.y = -10;
+      }
+
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 35; i++) particles.push(new Particle(false));
+
+    function triggerConfetti() {
+      for (let i = 0; i < 90; i++) particles.push(new Particle(true));
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  </script>
+</body>
+</html>
