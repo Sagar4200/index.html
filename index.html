@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b141a">
+<title>Tic-Tac-Toe Ultra | WhatsApp Edition</title>
+<style>
+:root{
+--bg:#0b141a;--bg-secondary:#12121f;--surface:#1a1a2e;--surface-light:#252540;
+--wa-outgoing:#005c4b;--wa-outgoing-dark:#004d3f;
+--wa-incoming:#202c33;--wa-chat-bg:#0b141a;--wa-bubble-text:#e9edef;
+--primary:#00d2ff;--primary-dark:#0099cc;--secondary:#ff6b6b;--secondary-dark:#cc5555;
+--accent:#feca57;--accent-dark:#d4a017;--success:#2ecc71;--success-dark:#27ae60;
+--text:#fff;--text-muted:#8696a0;--text-dim:#555570;
+--border:rgba(255,255,255,0.06);--border-light:rgba(255,255,255,0.1);
+--shadow-lg:0 16px 48px rgba(0,0,0,0.5);--shadow-glow:0 0 30px rgba(0,210,255,0.3);
+--radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+--tick-blue:#53bdeb;--tick-gray:rgba(233,237,239,0.6);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;position:fixed;width:100%}
+body{background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;padding:6px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));background-image:radial-gradient(circle at 20% 20%,rgba(0,210,255,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(254,202,87,0.05) 0%,transparent 50%)}
+.app-container{display:flex;flex-direction:column;gap:6px;width:100%;max-width:480px;background:var(--surface);padding:10px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);height:100%;max-height:calc(100dvh - 12px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:hidden;border:1px solid var(--border);position:relative}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.chat-messages::-webkit-scrollbar{width:6px}
+.chat-messages::-webkit-scrollbar-track{background:transparent}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--surface-light);border-radius:3px}
+.chat-messages::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+/* LOBBY */
+.lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px 10px;height:100%;overflow-y:auto}
+.lobby-logo{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;justify-content:center;align-items:center;font-size:2.5rem;box-shadow:var(--shadow-glow);animation:pulseLogo 2s ease infinite}
+@keyframes pulseLogo{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.lobby h1{font-size:2rem;background:linear-gradient(90deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;font-weight:800}
+.lobby p{color:var(--text-muted);text-align:center;font-size:.9rem;line-height:1.6;max-width:300px}
+.input-group{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
+.input-wrapper{position:relative;width:100%}
+.input-wrapper .input-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none;opacity:.6}
+input{padding:16px 16px 16px 46px;border-radius:var(--radius-md);border:2px solid var(--surface-light);background:var(--bg-secondary);color:#fff;font-size:1rem;outline:none;transition:all .25s;width:100%}
+input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(0,210,255,.1)}
+input::placeholder{color:var(--text-dim)}
+button{padding:16px 24px;border:none;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#000;font-weight:700;font-size:1rem;cursor:pointer;transition:all .25s;box-shadow:0 4px 15px rgba(0,210,255,.3);position:relative;overflow:hidden}
+button:hover{transform:translateY(-2px)}
+button:active{transform:translateY(0) scale(.98)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.btn-danger{background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));color:#fff}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;gap:6px;padding:2px 0;flex-shrink:0}
+.profile-container{position:relative;z-index:100;flex-shrink:0}
+.profile-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#000;font-size:1rem;display:flex;justify-content:center;align-items:center;cursor:pointer;border:2px solid rgba(255,255,255,.2);box-shadow:0 4px 15px rgba(0,210,255,.3);padding:0;font-weight:700;position:relative}
+.profile-btn:active{transform:scale(.95)}
+.profile-btn .online-dot{position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--surface)}
+.profile-btn .online-dot.online{background:var(--success);box-shadow:0 0 10px var(--success);animation:pulseDot 2s infinite}
+.profile-btn .online-dot.offline{background:var(--secondary)}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.1)}}
+.audio-indicator{display:none;align-items:center;gap:4px;padding:4px 8px;background:rgba(46,204,113,.15);border:1px solid var(--success);border-radius:12px;font-size:.6rem;font-weight:700;color:var(--success)}
+.audio-indicator.active{display:flex;animation:glowAudio 1.5s infinite}
+@keyframes glowAudio{0%,100%{box-shadow:0 0 8px rgba(46,204,113,.3)}50%{box-shadow:0 0 16px rgba(46,204,113,.6)}}
+.audio-indicator .live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulseDot 1s infinite}
+
+/* PROFILE MENU */
+.profile-menu{position:absolute;top:46px;left:0;background:var(--surface-light);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-lg);min-width:280px;overflow:hidden;display:none;z-index:200}
+.profile-menu.active{display:block;animation:menuSlide .2s ease}
+@keyframes menuSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.profile-menu-header{padding:14px;background:rgba(0,210,255,.08);border-bottom:1px solid var(--border)}
+.profile-menu-header .label{font-size:.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:4px;font-weight:600}
+.profile-menu-header .name{font-weight:700;font-size:1rem;color:var(--primary);display:block}
+.profile-menu-header .room{font-size:.75rem;color:var(--text-muted);margin-top:4px;display:block}
+.profile-menu-divider{height:1px;background:var(--border)}
+.profile-menu-opponent{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.profile-menu-opponent .opp-info{flex:1}
+.profile-menu-opponent .label{font-size:.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px}
+.profile-menu-opponent .opp-name{color:var(--text);font-weight:600;font-size:.9rem}
+.profile-audio-section{padding:12px 14px;background:rgba(0,210,255,.04)}
+.profile-audio-section .audio-title{font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:block;font-weight:600}
+.audio-code-input{width:100%;padding:10px 14px;font-size:1rem;border-radius:var(--radius-sm);border:1px solid var(--border-light);background:var(--bg-secondary);color:var(--text);text-align:center;letter-spacing:6px;font-weight:700;height:42px;outline:none;transition:all .25s}
+.audio-code-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,210,255,.15)}
+.audio-code-input.active{border-color:var(--success);box-shadow:0 0 0 3px rgba(46,204,113,.15);color:var(--success)}
+.audio-code-input.error{border-color:var(--secondary);animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.audio-status{font-size:.7rem;color:var(--text-muted);margin-top:8px;text-align:center;min-height:16px}
+.audio-status.active{color:var(--success)}
+.audio-status.error{color:var(--secondary)}
+.profile-stats{padding:12px 14px}
+.profile-stats-title{font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:block;font-weight:600}
+.stat-row{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;padding:7px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.stat-row .stat-label{color:var(--text-muted);font-weight:500}
+.stat-row .stat-value{font-weight:700;font-size:.95rem;min-width:30px;text-align:right}
+.stat-row .stat-value.x-color{color:var(--accent)}
+.stat-row .stat-value.o-color{color:var(--secondary)}
+.profile-menu-item{padding:12px 14px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--text);border:none;background:transparent;width:100%;text-align:left;border-radius:0;box-shadow:none;font-weight:500}
+.profile-menu-item:hover{background:rgba(255,255,255,.05)}
+.profile-menu-item.danger{color:var(--secondary)}
+
+/* SPLIT */
+.split-container{display:flex;flex-direction:column;flex:1;width:100%;min-height:0;overflow:hidden}
+.game-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;overflow:hidden;flex-shrink:0;padding:4px 0;flex-basis:50%;min-height:0}
+.splitter{height:14px;width:100%;flex-shrink:0;display:flex;justify-content:center;align-items:center;cursor:row-resize;position:relative;touch-action:none;z-index:50;margin:1px 0}
+.splitter::before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;background:var(--border-light);transform:translateY(-50%);border-radius:2px}
+.splitter .splitter-handle{width:60px;height:6px;background:var(--surface-light);border-radius:3px;border:1px solid var(--border-light);display:flex;justify-content:center;align-items:center;position:relative;z-index:1;transition:all .25s}
+.splitter .splitter-handle::before{content:'≡';color:var(--text-muted);font-size:.7rem;font-weight:bold;letter-spacing:-1px}
+.splitter.active::before{background:var(--primary);height:3px;box-shadow:0 0 12px var(--primary)}
+.splitter.active .splitter-handle{background:var(--primary);border-color:var(--primary);transform:scale(1.15)}
+.splitter.active .splitter-handle::before{color:#000}
+.chat-panel{flex:1;min-height:140px;display:flex;flex-direction:column;background:var(--wa-chat-bg);border-radius:var(--radius-lg);padding:0;border:1px solid var(--border);overflow:hidden;position:relative}
+.split-container.dragging .chat-panel,.split-container.dragging .game-panel,.split-container.dragging .splitter::before,.split-container.dragging .splitter-handle{transition:none !important}
+
+/* GAME */
+.board-wrapper{position:relative;width:100%;aspect-ratio:1;margin:0 auto;flex-shrink:0;max-height:100%}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface-light);padding:6px;border-radius:var(--radius-lg);width:100%;height:100%;border:1px solid var(--border);position:relative}
+.board-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,10,20,.92);display:none;justify-content:center;align-items:center;border-radius:var(--radius-lg);z-index:10;backdrop-filter:blur(4px);padding:12px;pointer-events:none}
+.board-overlay.active{display:flex;pointer-events:auto}
+.board-overlay-text{text-align:center;font-size:.8rem;color:var(--text-muted);line-height:1.5}
+.board-overlay-text strong{color:var(--primary);display:block;font-size:.95rem;margin-bottom:6px;font-weight:800}
+.board-overlay-text .icon-big{font-size:2.2rem;display:block;margin-bottom:8px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.cell{background:var(--bg-secondary);border-radius:var(--radius-md);display:flex;justify-content:center;align-items:center;font-size:clamp(1.5rem,7vw,2.4rem);font-weight:900;cursor:pointer;transition:all .25s;user-select:none;border:1px solid var(--border);position:relative;overflow:hidden;min-height:0}
+.cell:active{transform:scale(.95)}
+.cell.x{color:var(--accent);text-shadow:0 0 20px rgba(254,202,87,.5)}
+.cell.o{color:var(--secondary);text-shadow:0 0 20px rgba(255,107,107,.5)}
+.cell.win{background:linear-gradient(135deg,var(--success),var(--success-dark));color:#fff;animation:winPulse 1s infinite}
+@keyframes winPulse{0%,100%{box-shadow:0 0 20px rgba(46,204,113,.5)}50%{box-shadow:0 0 40px rgba(46,204,113,.8)}}
+.turn-indicator{flex:1;max-width:160px;padding:6px 10px;border:2px solid var(--primary);border-radius:15px;white-space:nowrap;font-size:.65rem;font-weight:700;background:rgba(0,210,255,.1);transition:all .25s;text-align:center}
+.turn-indicator.your-turn{border-color:var(--primary);background:rgba(0,210,255,.15);color:var(--primary);animation:glowTurn 1.5s infinite}
+@keyframes glowTurn{0%,100%{box-shadow:0 0 10px rgba(0,210,255,.3)}50%{box-shadow:0 0 20px rgba(0,210,255,.6)}}
+.turn-indicator.opp-turn{border-color:var(--secondary);background:rgba(255,107,107,.15);color:var(--secondary)}
+.turn-indicator.waiting{border-color:var(--text-muted);background:rgba(136,136,160,.1);color:var(--text-muted)}
+.start-btn{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--success),var(--success-dark));color:#fff;font-size:.85rem;display:flex;justify-content:center;align-items:center;cursor:pointer;border:none;padding:0;flex-shrink:0}
+.start-btn:disabled{opacity:.4;cursor:not-allowed}
+.reset-btn{width:32px;height:32px;border-radius:50%;background:var(--surface-light);color:var(--secondary);font-size:.9rem;display:flex;justify-content:center;align-items:center;cursor:pointer;border:1px solid rgba(255,107,107,.3);padding:0;flex-shrink:0}
+
+/* ==========================================
+   WHATSAPP-STYLE CHAT
+   ========================================== */
+.sidebar-title{font-size:.75rem;font-weight:700;color:var(--primary);margin:8px 10px 4px 10px;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;line-height:1}
+.sidebar-title .unread-badge{background:var(--secondary);color:#fff;font-size:.6rem;padding:1px 6px;border-radius:8px;font-weight:700;display:none}
+.sidebar-title .unread-badge.active{display:inline-block}
+.typing-indicator{display:none;align-items:center;gap:6px;padding:4px 14px;margin-bottom:4px;font-size:.72rem;color:var(--primary);font-style:italic;height:20px;flex-shrink:0;line-height:1;font-weight:600}
+.typing-indicator.active{display:flex}
+.typing-indicator .typing-text{display:flex;align-items:center;gap:4px}
+.typing-indicator .typing-dots{display:inline-flex;align-items:center;gap:3px}
+.typing-indicator .typing-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--primary);animation:typingBounce 1.4s infinite ease-in-out}
+.typing-indicator .typing-dots span:nth-child(1){animation-delay:0s}
+.typing-indicator .typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-indicator .typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+
+/* WhatsApp chat background with subtle pattern */
+.chat-messages{
+flex:1;
+overflow-y:auto;
+padding:8px 10px;
+display:flex;
+flex-direction:column;
+gap:3px;
+font-size:.9rem;
+overscroll-behavior:contain;
+-webkit-overflow-scrolling:touch;
+min-height:0;
+background-color:var(--wa-chat-bg);
+background-image:
+radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),
+radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px);
+background-size:20px 20px;
+background-position:0 0,10px 10px;
+}
+
+/* ==========================================
+   MESSAGE BUBBLE (WhatsApp-style)
+   ========================================== */
+.msg-wrapper{
+display:flex;
+flex-direction:column;
+max-width:80%;
+position:relative;
+}
+.msg-wrapper.me{align-self:flex-end;align-items:flex-end}
+.msg-wrapper.them{align-self:flex-start;align-items:flex-start}
+
+.msg{
+display:inline-block;
+padding:6px 9px 6px 9px;
+border-radius:8px;
+word-wrap:break-word;
+line-height:1.35;
+position:relative;
+cursor:pointer;
+max-width:100%;
+font-size:.9rem;
+}
+.msg::after{content:'';display:table;clear:both}
+
+.msg.me{
+background:var(--wa-outgoing);
+color:var(--wa-bubble-text);
+border-bottom-right-radius:2px;
+}
+.msg.them{
+background:var(--wa-incoming);
+color:var(--wa-bubble-text);
+border-bottom-left-radius:2px;
+}
+.msg.deleted{opacity:.65;font-style:italic}
+.msg.me.deleted{background:rgba(0,92,75,.4);color:rgba(233,237,239,.6)}
+.msg.them.deleted{background:rgba(32,44,51,.5);color:var(--text-muted)}
+
+.msg .reply-quote{
+display:block;
+padding:4px 7px;
+margin-bottom:4px;
+border-left:3px solid var(--tick-blue);
+background:rgba(0,0,0,.2);
+border-radius:5px;
+font-size:.72rem;
+opacity:.95;
+}
+.msg.me .reply-quote{border-left-color:#53bdeb;background:rgba(0,0,0,.25)}
+.msg.them .reply-quote{border-left-color:#53bdeb;background:rgba(0,0,0,.25)}
+.reply-quote .reply-name{font-weight:700;display:block;margin-bottom:1px;font-size:.65rem;color:#53bdeb}
+.reply-quote .reply-text{opacity:.9;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;color:rgba(233,237,239,.85)}
+
+.msg .msg-text{
+display:inline;
+font-size:.9rem;
+word-wrap:break-word;
+overflow-wrap:break-word;
+white-space:pre-wrap;
+}
+.msg.deleted .msg-text{text-decoration:line-through;opacity:.7}
+
+/* Time + Ticks - floated right, no overlap */
+.msg .msg-footer{
+display:inline-flex;
+align-items:center;
+gap:3px;
+float:right;
+margin-left:10px;
+margin-top:6px;
+margin-bottom:-3px;
+margin-right:-2px;
+font-size:.62rem;
+line-height:1;
+height:14px;
+white-space:nowrap;
+vertical-align:bottom;
+color:var(--tick-gray);
+}
+.msg .msg-time{
+font-size:.62rem;
+color:inherit;
+line-height:1;
+}
+
+/* ========================================================
+   TICK ICONS (WhatsApp-style)
+   ======================================================== */
+.msg-status{
+display:inline-flex;
+align-items:center;
+width:18px;
+height:11px;
+position:relative;
+margin-left:3px;
+flex-shrink:0;
+}
+.msg-status .tick{
+width:15px;
+height:11px;
+display:block;
+position:absolute;
+top:0;
+left:0;
+color:var(--tick-gray);
+}
+.msg-status .tick svg{
+width:100%;
+height:100%;
+display:block;
+}
+.msg-status .tick svg path{
+fill:currentColor;
+}
+.msg-status .tick-1{left:0;opacity:1;z-index:1}
+.msg-status .tick-2{left:4px;opacity:0;z-index:2}
+
+.msg-status.sent .tick-1{color:var(--tick-gray);opacity:1}
+.msg-status.sent .tick-2{opacity:0}
+
+.msg-status.delivered .tick-1{color:var(--tick-gray);opacity:1}
+.msg-status.delivered .tick-2{color:var(--tick-gray);opacity:1}
+
+.msg-status.seen .tick-1{color:var(--tick-blue);opacity:1}
+.msg-status.seen .tick-2{color:var(--tick-blue);opacity:1}
+
+/* Reaction badge - inside bubble bottom-left */
+.msg .reaction-badge{
+position:absolute;
+bottom:-8px;
+right:8px;
+background:var(--surface-light);
+border-radius:10px;
+padding:1px 5px;
+font-size:.7rem;
+border:1px solid var(--border-light);
+box-shadow:0 1px 4px rgba(0,0,0,.5);
+display:flex;
+gap:2px;
+line-height:1;
+z-index:3;
+}
+.msg.me .reaction-badge{right:auto;left:8px}
+
+.swipe-reply-indicator{
+position:absolute;
+left:-30px;
+top:50%;
+transform:translateY(-50%);
+width:26px;
+height:26px;
+border-radius:50%;
+background:var(--primary);
+color:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:.85rem;
+opacity:0;
+pointer-events:none;
+transition:opacity .15s ease;
+}
+.msg-wrapper.swiping .swipe-reply-indicator{opacity:1}
+
+/* ACTION MENU */
+.message-action-menu{position:fixed;background:var(--surface-light);border-radius:24px;padding:8px;display:none;flex-direction:column;gap:8px;box-shadow:0 12px 40px rgba(0,0,0,.6);border:1px solid var(--border-light);z-index:9999;min-width:240px}
+.message-action-menu.active{display:flex}
+.message-action-menu .reactions-row{display:flex;gap:4px;justify-content:center;padding:4px 4px 8px 4px;border-bottom:1px solid var(--border)}
+.message-action-menu .reaction-option{font-size:1.5rem;cursor:pointer;padding:4px;border-radius:50%;line-height:1;user-select:none}
+.message-action-menu .action-option{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--text);user-select:none}
+.message-action-menu .action-option:hover{background:rgba(255,255,255,.06)}
+.message-action-menu .action-option.danger{color:var(--secondary)}
+.message-action-menu .action-option .icon{font-size:1.2rem;width:24px;text-align:center}
+
+.msg.system{
+align-self:center;
+background:rgba(32,44,51,.7);
+color:var(--text-muted);
+font-style:italic;
+font-size:.7rem;
+text-align:center;
+max-width:90%;
+padding:4px 10px;
+border-radius:8px;
+cursor:default;
+box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+
+.reply-preview{display:none;padding:6px 10px;margin:4px 10px 0 10px;background:var(--surface);border-left:3px solid var(--tick-blue);border-radius:5px;font-size:.72rem;position:relative;flex-shrink:0;line-height:1.3}
+.reply-preview.active{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.reply-preview .preview-content{flex:1;overflow:hidden}
+.reply-preview .preview-name{font-weight:700;color:var(--tick-blue);display:block;font-size:.62rem;margin-bottom:1px}
+.reply-preview .preview-text{color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;font-size:.7rem}
+.reply-preview .close-reply{background:transparent;border:none;color:var(--text-muted);font-size:1rem;cursor:pointer;padding:2px 6px;box-shadow:none;border-radius:50%;line-height:1;min-width:auto;width:auto}
+
+/* CHAT INPUT (WhatsApp-style) */
+.chat-input{display:flex;gap:6px;padding:8px 10px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--border);align-items:center;flex-shrink:0;position:relative;z-index:2}
+.chat-input input{padding:8px 14px;font-size:.9rem;border-radius:20px;padding-left:14px;flex:1;height:38px;border-width:1px;background:var(--bg-secondary)}
+.chat-input button{padding:0 16px;font-size:.85rem;border-radius:20px;flex-shrink:0;min-width:60px;height:38px;display:flex;justify-content:center;align-items:center}
+
+/* TOAST */
+.toast-container{position:fixed;top:calc(20px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:90%}
+.toast{background:var(--surface-light);color:var(--text);padding:12px 20px;border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-lg);font-size:.85rem;font-weight:600;min-width:200px;text-align:center;animation:toastIn .3s ease,toastOut .3s ease 2.7s forwards;pointer-events:auto}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--secondary);color:var(--secondary)}
+.toast.info{border-color:var(--primary);color:var(--primary)}
+.toast.warning{border-color:var(--accent);color:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-20px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-20px) scale(.9)}}
+
+/* MODAL */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;justify-content:center;align-items:center;z-index:1000;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);padding:28px;border-radius:var(--radius-lg);max-width:340px;width:90%;text-align:center;border:1px solid var(--border-light)}
+.modal-icon{font-size:3rem;margin-bottom:12px;display:block}
+.modal h3{font-size:1.3rem;margin-bottom:10px;color:var(--primary);font-weight:800}
+.modal p{font-size:.9rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6}
+.modal-buttons{display:flex;gap:10px}
+.modal-buttons button{flex:1;padding:14px;font-size:.9rem}
+.btn-cancel{background:transparent;color:var(--text);border:1px solid var(--border-light);box-shadow:none}
+
+@media (min-width:768px){.app-container{max-width:520px;height:90vh}}
+@media (max-width:400px){.top-bar{gap:3px}.turn-indicator{min-width:55px;font-size:.58rem;padding:5px 7px}.start-btn,.reset-btn{width:28px;height:28px;font-size:.75rem}.profile-btn{width:32px;height:32px;font-size:.9rem}}
+@media (max-height:600px){.chat-panel{min-height:120px}.game-panel{min-height:100px}}
+@supports (height:100dvh){.app-container{max-height:calc(100dvh - 12px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="message-action-menu" id="messageActionMenu">
+    <div class="reactions-row">
+        <span class="reaction-option" data-reaction="❤️">❤️</span>
+        <span class="reaction-option" data-reaction="😂">😂</span>
+        <span class="reaction-option" data-reaction="👍">👍</span>
+        <span class="reaction-option" data-reaction="😮">😮</span>
+        <span class="reaction-option" data-reaction="😢">😢</span>
+        <span class="reaction-option" data-reaction="😡">😡</span>
+    </div>
+    <div class="action-option" id="deleteMsgOption" data-action="delete">
+        <span class="icon">🗑️</span>
+        <span>Delete Message</span>
+    </div>
+</div>
+
+<div class="app-container" id="app">
+    <div class="top-bar" id="topBar" style="display:none;">
+        <div class="profile-container">
+            <button class="profile-btn" id="profileBtn">
+                👤
+                <span class="online-dot offline" id="myOnlineDot"></span>
+            </button>
+            <div class="profile-menu" id="profileMenu">
+                <div class="profile-menu-header">
+                    <span class="label">You</span>
+                    <span class="name" id="profileName">User</span>
+                    <span class="room" id="profileRoom">Room: ---</span>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <div class="profile-menu-opponent">
+                    <div class="opp-info">
+                        <span class="label">Opponent</span>
+                        <span class="opp-name" id="profileOpponent">Waiting...</span>
+                    </div>
+                    <span class="status-dot offline" id="profileOpponentDot" style="width:10px;height:10px;border-radius:50%;"></span>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <div class="profile-audio-section">
+                    <span class="audio-title">🎤 Live Audio</span>
+                    <input type="tel" id="audioCodeInput" class="audio-code-input" placeholder="• • • • • •" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    <div class="audio-status" id="audioStatus">Enter 6-digit code</div>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <div class="profile-stats">
+                    <span class="profile-stats-title">📊 Match Statistics</span>
+                    <div class="stat-row"><span class="stat-label">🎮 Total Matches</span><span class="stat-value" id="statTotal">0</span></div>
+                    <div class="stat-row"><span class="stat-label">🟡 X Wins</span><span class="stat-value x-color" id="statXWins">0</span></div>
+                    <div class="stat-row"><span class="stat-label">🔴 O Wins</span><span class="stat-value o-color" id="statOWins">0</span></div>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <button class="profile-menu-item danger" id="logoutBtn"><span>🚪</span> Logout</button>
+            </div>
+        </div>
+        <div class="audio-indicator" id="audioIndicator"><span class="live-dot"></span><span>LIVE</span></div>
+        <div class="turn-indicator waiting" id="turnIndicator">Waiting</div>
+        <button class="start-btn" id="startSymbolBtn" title="Start">🔄</button>
+        <button class="reset-btn" id="resetBtn" title="Reset">↻</button>
+    </div>
+
+    <div class="lobby" id="lobby">
+        <div class="lobby-logo">🎮</div>
+        <h1>Tic-Tac-Toe Ultra</h1>
+        <p>Real-time multiplayer with advanced chat. Play with your partner across devices.</p>
+        <div class="input-group">
+            <div class="input-wrapper"><span class="input-icon">👤</span><input type="text" id="usernameInput" placeholder="Your Username" maxlength="15" autocomplete="off"></div>
+            <div class="input-wrapper"><span class="input-icon">🔑</span><input type="text" id="roomInput" placeholder="Room Code (e.g., LOVE)" maxlength="10" autocomplete="off"></div>
+            <button id="joinBtn">Join Room</button>
+        </div>
+    </div>
+
+    <div class="split-container" id="splitContainer" style="display:none;">
+        <div class="game-panel" id="gamePanel">
+            <div class="board-wrapper">
+                <div class="board" id="board">
+                    <div class="board-overlay active" id="boardOverlay">
+                        <div class="board-overlay-text">
+                            <span class="icon-big">⏳</span>
+                            <strong>Waiting to Start</strong>
+                            Click the 🔄 symbol above to start a new match
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="splitter" id="splitter"><div class="splitter-handle"></div></div>
+        <div class="chat-panel" id="chatPanel">
+            <div class="sidebar-title"><span>💬 Chat</span><span class="unread-badge" id="unreadBadge">0</span></div>
+            <div class="typing-indicator" id="typingIndicator"><span class="typing-text"><span>typing</span><span class="typing-dots"><span></span><span></span><span></span></span></span></div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="reply-preview" id="replyPreview">
+                <div class="preview-content">
+                    <span class="preview-name" id="replyPreviewName">Replying to</span>
+                    <span class="preview-text" id="replyPreviewText"></span>
+                </div>
+                <button class="close-reply" id="closeReplyBtn">✕</button>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Type a message..." maxlength="200" autocomplete="off">
+                <button id="sendChatBtn">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+        <span class="modal-icon">⚠️</span>
+        <h3>Reset Match?</h3>
+        <p>Are you sure you want to reset? This will clear the current board.</p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" id="cancelReset">Cancel</button>
+            <button class="btn-danger" id="confirmReset">Yes, Reset</button>
+        </div>
+    </div>
+</div>
+
+<audio id="remoteAudio" autoplay playsinline></audio>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded, onValue, set, serverTimestamp, onDisconnect, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCPsT60Kw0WTBj4UoC-KH15ryHAPB61v7k",
+    authDomain: "chat-bot-5bb8d.firebaseapp.com",
+    databaseURL: "https://chat-bot-5bb8d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "chat-bot-5bb8d",
+    storageBucket: "chat-bot-5bb8d.firebasestorage.app",
+    messagingSenderId: "808798432084",
+    appId: "1:808798432084:web:19f8741d7a9fbb707536c1",
+    measurementId: "G-FTQ2VD6SFJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const AUDIO_UNLOCK_CODE = "741501";
+
+// WhatsApp-style double check SVG
+const TICK_SVG = '<svg viewBox="0 0 16 11" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M11.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-2.405-2.272a.463.463 0 0 0-.336-.146.47.47 0 0 0-.343.146l-.311.31a.445.445 0 0 0-.14.337c0 .136.047.25.14.343l2.996 2.996a.724.724 0 0 0 .501.193.697.697 0 0 0 .547-.29l6.816-8.358a.438.438 0 0 0 .106-.291.462.462 0 0 0-.152-.336L11.07.653z"/></svg>';
+
+const Utils = {
+    formatTime12h(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        let h = d.getHours();
+        const m = d.getMinutes().toString().padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h}:${m} ${ampm}`;
+    },
+    showToast(message, type = 'info', duration = 2500) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, duration);
+    },
+    vibrate(p = 30) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} },
+    debounce(fn, wait) { let t; return function(...a){ clearTimeout(t); t = setTimeout(() => fn.apply(this, a), wait); }; },
+    throttle(fn, limit) { let it; return function(...a){ if(!it){ fn.apply(this, a); it = true; setTimeout(() => it = false, limit); } }; },
+    generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+};
+
+class FirebaseBackend {
+    constructor(roomId) {
+        this.roomId = roomId;
+        this.listeners = {};
+        this.eventsRef = ref(database, `rooms/${roomId}/events`);
+        this._unsub = onChildAdded(this.eventsRef, (snapshot) => {
+            const payload = snapshot.val();
+            if (!payload) return;
+            const { type, data } = payload;
+            if (this.listeners[type]) {
+                this.listeners[type].forEach(cb => { try { cb(data); } catch (e) { console.error('Listener error:', e); } });
+            }
+        });
+    }
+    on(event, callback) { if (!this.listeners[event]) this.listeners[event] = []; this.listeners[event].push(callback); }
+    send(event, data) { try { push(this.eventsRef, { type, data, timestamp: serverTimestamp() }); } catch (e) { console.error('Send error:', e); } }
+    destroy() { if (this._unsub) { try { this._unsub(); } catch (e) {} this._unsub = null; } this.listeners = {}; }
+}
+
+class AudioManager {
+    constructor(app) {
+        this.app = app;
+        this.localStream = null;
+        this.peerConnection = null;
+        this.remoteAudio = document.getElementById('remoteAudio');
+        this.isAudioOn = false;
+        this.sessionId = null;
+        this.role = null;
+        this.iceCandidateQueue = [];
+        this.remoteDescriptionSet = false;
+        this.rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+    }
+    async requestPermission() {
+        if (this.localStream && this.localStream.active) return true;
+        try {
+            this.localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false });
+            return true;
+        } catch (e) { console.error('Permission error:', e); return false; }
+    }
+    async start() {
+        if (this.isAudioOn) return true;
+        if (!this.app.opponentName || this.app.opponentName === 'Waiting...') { Utils.showToast('Waiting for opponent', 'warning'); return false; }
+        const hasPermission = await this.requestPermission();
+        if (!hasPermission) { Utils.showToast('Microphone permission required', 'error'); return false; }
+        this.isAudioOn = true;
+        this.sessionId = Utils.generateId();
+        const names = [this.app.username, this.app.opponentName].sort();
+        this.role = (this.app.username === names[0]) ? 'caller' : 'receiver';
+        this.setupSignaling();
+        this.app.backend.send('audio_start', { by: this.app.username, sessionId: this.sessionId, role: this.role });
+        if (this.role === 'caller') {
+            setTimeout(() => { if (this.isAudioOn && !this.peerConnection) this.createOffer(); }, 1000);
+        }
+        this.updateUI(true);
+        this.app.addSystemMessage('🎤 Live audio active');
+        Utils.vibrate(50);
+        return true;
+    }
+    setupSignaling() {
+        const self = this;
+        const sid = this.sessionId;
+        const handleOffer = async (data) => { if (!self.isAudioOn || data.sessionId !== sid || self.role !== 'receiver' || self.peerConnection) return; await self.receiveOffer(data); };
+        const handleAnswer = async (data) => {
+            if (!self.isAudioOn || data.sessionId !== sid || self.role !== 'caller' || !self.peerConnection) return;
+            if (self.peerConnection.signalingState === 'stable') return;
+            try { await self.peerConnection.setRemoteDescription({ type: 'answer', sdp: data.sdp }); self.remoteDescriptionSet = true; await self.flushIceQueue(); } catch (e) {}
+        };
+        const handleIce = async (data) => {
+            if (!self.isAudioOn || data.sessionId !== sid || data.from === self.app.username) return;
+            if (!self.peerConnection || !self.remoteDescriptionSet) { self.iceCandidateQueue.push(data.candidate); return; }
+            try { await self.peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch (e) {}
+        };
+        const handleStop = (data) => { if (data.sessionId !== sid || data.from === self.app.username) return; self.stop(false); };
+        this.app.backend.on('audio_offer', handleOffer);
+        this.app.backend.on('audio_answer', handleAnswer);
+        this.app.backend.on('audio_ice', handleIce);
+        this.app.backend.on('audio_stop', handleStop);
+    }
+    async createOffer() {
+        try {
+            if (!this.localStream || this.peerConnection) return;
+            this.peerConnection = this.createPeerConnection();
+            this.localStream.getTracks().forEach(t => this.peerConnection.addTrack(t, this.localStream));
+            const offer = await this.peerConnection.createOffer({ offerToReceiveAudio: true });
+            await this.peerConnection.setLocalDescription(offer);
+            this.app.backend.send('audio_offer', { by: this.app.username, sessionId: this.sessionId, type: 'offer', sdp: offer.sdp });
+        } catch (e) { console.error('Create offer error:', e); }
+    }
+    async receiveOffer(data) {
+        try {
+            if (!this.localStream || this.peerConnection) return;
+            this.peerConnection = this.createPeerConnection();
+            this.localStream.getTracks().forEach(t => this.peerConnection.addTrack(t, this.localStream));
+            await this.peerConnection.setRemoteDescription({ type: 'offer', sdp: data.sdp });
+            this.remoteDescriptionSet = true;
+            await this.flushIceQueue();
+            const answer = await this.peerConnection.createAnswer();
+            await this.peerConnection.setLocalDescription(answer);
+            this.app.backend.send('audio_answer', { by: this.app.username, sessionId: this.sessionId, type: 'answer', sdp: answer.sdp });
+        } catch (e) { console.error('Receive offer error:', e); }
+    }
+    createPeerConnection() {
+        const pc = new RTCPeerConnection(this.rtcConfig);
+        const self = this;
+        pc.ontrack = (event) => { if (event.streams && event.streams[0]) { self.remoteAudio.srcObject = event.streams[0]; self.remoteAudio.play().catch(e => console.error('Play error:', e)); } };
+        pc.onicecandidate = (event) => { if (event.candidate) { self.app.backend.send('audio_ice', { by: self.app.username, sessionId: self.sessionId, from: self.app.username, candidate: event.candidate.toJSON() }); } };
+        return pc;
+    }
+    async flushIceQueue() {
+        if (!this.peerConnection) return;
+        while (this.iceCandidateQueue.length > 0) {
+            const c = this.iceCandidateQueue.shift();
+            try { await this.peerConnection.addIceCandidate(new RTCIceCandidate(c)); } catch (e) {}
+        }
+    }
+    async stop(notify = true) {
+        try {
+            const wasOn = this.isAudioOn;
+            this.isAudioOn = false;
+            if (notify && this.sessionId) this.app.backend.send('audio_stop', { by: this.app.username, from: this.app.username, sessionId: this.sessionId });
+            if (this.peerConnection) { try { this.peerConnection.ontrack = null; this.peerConnection.onicecandidate = null; this.peerConnection.close(); } catch (e) {} this.peerConnection = null; }
+            if (this.localStream) { try { this.localStream.getTracks().forEach(t => t.stop()); } catch (e) {} this.localStream = null; }
+            if (this.remoteAudio) { try { this.remoteAudio.srcObject = null; } catch (e) {} }
+            this.iceCandidateQueue = [];
+            this.remoteDescriptionSet = false;
+            this.updateUI(false);
+            if (wasOn) this.app.addSystemMessage('🎤 Live audio stopped');
+        } catch (e) {}
+    }
+    updateUI(isActive) {
+        const indicator = document.getElementById('audioIndicator');
+        const input = document.getElementById('audioCodeInput');
+        const status = document.getElementById('audioStatus');
+        if (isActive) {
+            if (indicator) indicator.classList.add('active');
+            if (input) input.classList.add('active');
+            if (status) { status.textContent = '🎤 Live audio active'; status.classList.add('active'); status.classList.remove('error'); }
+        } else {
+            if (indicator) indicator.classList.remove('active');
+            if (input) input.classList.remove('active', 'error');
+            if (status) { status.textContent = 'Enter 6-digit code'; status.classList.remove('active', 'error'); }
+        }
+    }
+    handleOpponentStart(data) {
+        if (data.by === this.app.username) return;
+        this.app.addSystemMessage(`🎤 ${data.by} started live audio`);
+        Utils.showToast(`🎤 ${data.by} is live`, 'info', 2000);
+    }
+    handleOpponentStop(data) {
+        if (data.by === this.app.username) return;
+        this.app.addSystemMessage(`🎤 ${data.by} stopped live audio`);
+        if (this.peerConnection && !this.isAudioOn) this.stop(false);
+    }
+}
+
+const App = {
+    username: '', roomId: '', backend: null, audioManager: null,
+    messagesRef: null, messagesListenerUnsub: null,
+    playerSymbol: null, opponentName: 'Waiting...', opponentOnline: false,
+    isMyTurn: false, board: Array(9).fill(null), gameOver: true,
+    matchStarted: false, players: {}, stats: { total: 0, xWins: 0, oWins: 0 },
+    unreadCount: 0, typingSendInterval: null, isTyping: false, remoteTypingTimeout: null,
+    maxMessages: 300, maxMessageMapSize: 500, autoScrollEnabled: true,
+    listeners: [], isInitialized: false, cleanupHandlers: [],
+    messagesMap: {}, deliveredMarked: new Set(), seenMarked: new Set(),
+    replyingTo: null, selectedMessageId: null,
+    gamePanelRatio: 0.5, isDragging: false, dragStartY: 0, dragStartGameHeight: 0,
+    dragStartChatHeight: 0, dragRafId: null, minGameHeight: 120, minChatHeight: 140,
+    globalSwipe: { active: false, startX: 0, startY: 0, currentX: 0, horizontalSwipe: false, targetWrapper: null, targetMsgId: null, msgData: null },
+    globalLongPress: { active: false, timer: null, targetMsgId: null, isMyMessage: false, startX: 0, startY: 0 },
+    els: {},
+
+    init() {
+        if (this.isInitialized) return;
+        this.isInitialized = true;
+        try {
+            this.cacheElements();
+            this.bindEvents();
+            this.renderBoard();
+            this.setupActionMenu();
+            this.setupSplitter();
+            this.setupGlobalPointerHandlers();
+            this.audioManager = new AudioManager(this);
+            this.setupAudioCodeInput();
+            this.checkAutoLogin();
+            this.handleViewportChange();
+
+            const onUnload = () => this.cleanup();
+            const onResize = () => { this.handleViewportChange(); this.applySplitRatio(); };
+            const onOrientation = () => setTimeout(() => { this.handleViewportChange(); this.applySplitRatio(); }, 300);
+            const onVisibility = () => { if (document.visibilityState === 'visible') { this.unreadCount = 0; this.updateUnreadBadge(); setTimeout(() => this.handleViewportChange(), 100); if (this.autoScrollEnabled) this.markMessagesAsSeen(); } };
+            const onFocus = () => { if (this.autoScrollEnabled) this.markMessagesAsSeen(); };
+
+            window.addEventListener('beforeunload', onUnload);
+            window.addEventListener('pagehide', onUnload);
+            window.addEventListener('resize', onResize);
+            window.addEventListener('orientationchange', onOrientation);
+            document.addEventListener('visibilitychange', onVisibility);
+            window.addEventListener('focus', onFocus);
+
+            if (window.visualViewport) {
+                const vvR = () => this.handleViewportChange();
+                window.visualViewport.addEventListener('resize', vvR);
+                window.visualViewport.addEventListener('scroll', vvR);
+                this.cleanupHandlers.push(() => {
+                    window.visualViewport.removeEventListener('resize', vvR);
+                    window.visualViewport.removeEventListener('scroll', vvR);
+                });
+            }
+            this.cleanupHandlers.push(() => {
+                window.removeEventListener('beforeunload', onUnload);
+                window.removeEventListener('pagehide', onUnload);
+                window.removeEventListener('resize', onResize);
+                window.removeEventListener('orientationchange', onOrientation);
+                document.removeEventListener('visibilitychange', onVisibility);
+                window.removeEventListener('focus', onFocus);
+            });
+        } catch (e) { console.error('Init error:', e); }
+    },
+
+    handleViewportChange() {
+        try {
+            const vv = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            document.documentElement.style.setProperty('--app-height', vv + 'px');
+            const appEl = document.getElementById('app');
+            if (appEl) appEl.style.height = vv + 'px';
+        } catch (e) {}
+    },
+
+    cacheElements() {
+        this.els = {
+            topBar: document.getElementById('topBar'),
+            lobby: document.getElementById('lobby'),
+            splitContainer: document.getElementById('splitContainer'),
+            gamePanel: document.getElementById('gamePanel'),
+            chatPanel: document.getElementById('chatPanel'),
+            splitter: document.getElementById('splitter'),
+            board: document.getElementById('board'),
+            boardOverlay: document.getElementById('boardOverlay'),
+            turnIndicator: document.getElementById('turnIndicator'),
+            chatMessages: document.getElementById('chatMessages'),
+            chatInput: document.getElementById('chatInput'),
+            unreadBadge: document.getElementById('unreadBadge'),
+            typingIndicator: document.getElementById('typingIndicator'),
+            replyPreview: document.getElementById('replyPreview'),
+            replyPreviewName: document.getElementById('replyPreviewName'),
+            replyPreviewText: document.getElementById('replyPreviewText'),
+            actionMenu: document.getElementById('messageActionMenu'),
+            myOnlineDot: document.getElementById('myOnlineDot'),
+            profileOpponentDot: document.getElementById('profileOpponentDot'),
+            audioIndicator: document.getElementById('audioIndicator'),
+            audioCodeInput: document.getElementById('audioCodeInput'),
+            audioStatus: document.getElementById('audioStatus')
+        };
+    },
+
+    cleanup() {
+        try {
+            if (this.typingSendInterval) clearInterval(this.typingSendInterval);
+            if (this.remoteTypingTimeout) clearTimeout(this.remoteTypingTimeout);
+            if (this.globalLongPress.timer) clearTimeout(this.globalLongPress.timer);
+            if (this.dragRafId) cancelAnimationFrame(this.dragRafId);
+            if (this.isTyping && this.backend) this.backend.send('typing', { username: this.username, typing: false });
+            if (this.messagesListenerUnsub) { try { this.messagesListenerUnsub(); } catch (e) {} this.messagesListenerUnsub = null; }
+            if (this.audioManager) this.audioManager.stop(false);
+            this.setOffline();
+            if (this.backend) { this.backend.destroy(); this.backend = null; }
+            this.cleanupHandlers.forEach(h => { try { h(); } catch (e) {} });
+            this.cleanupHandlers = [];
+            this.messagesMap = {};
+        } catch (e) {}
+    },
+
+    checkAutoLogin() {
+        try {
+            const u = localStorage.getItem('ttt_username');
+            const r = localStorage.getItem('ttt_room');
+            if (u && r) {
+                document.getElementById('usernameInput').value = u;
+                document.getElementById('roomInput').value = r;
+                setTimeout(() => this.joinRoom(), 300);
+            }
+        } catch (e) {}
+    },
+
+    setupAudioCodeInput() {
+        const input = this.els.audioCodeInput;
+        if (!input) return;
+        input.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length > 6) val = val.slice(0, 6);
+            if (e.target.value !== val) e.target.value = val;
+            input.classList.remove('error');
+            if (val.length === 6) this.handleAudioCodeSubmit(val);
+            else if (val.length === 0 && this.audioManager.isAudioOn) this.audioManager.stop();
+        });
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text');
+            const digits = pasted.replace(/\D/g, '').slice(0, 6);
+            input.value = digits;
+            input.dispatchEvent(new Event('input'));
+        });
+        input.addEventListener('keypress', (e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
+    },
+
+    async handleAudioCodeSubmit(code) {
+        const input = this.els.audioCodeInput;
+        const status = this.els.audioStatus;
+        if (code === AUDIO_UNLOCK_CODE) {
+            if (this.audioManager.isAudioOn) return;
+            if (status) { status.textContent = 'Starting...'; status.classList.remove('error', 'active'); }
+            const success = await this.audioManager.start();
+            if (!success) {
+                input.classList.add('error');
+                input.value = '';
+                if (status) { status.textContent = 'Failed'; status.classList.add('error'); }
+                setTimeout(() => {
+                    input.classList.remove('error');
+                    if (status && !this.audioManager.isAudioOn) { status.textContent = 'Enter 6-digit code'; status.classList.remove('error', 'active'); }
+                }, 2000);
+            }
+        } else {
+            input.classList.add('error');
+            if (status) { status.textContent = 'Invalid code'; status.classList.add('error'); }
+            setTimeout(() => {
+                if (input.value.length === 6 && input.value !== AUDIO_UNLOCK_CODE) input.value = '';
+                input.classList.remove('error');
+                if (status && !this.audioManager.isAudioOn) { status.textContent = 'Enter 6-digit code'; status.classList.remove('error'); }
+            }, 1500);
+            Utils.vibrate([30, 30, 30]);
+        }
+    },
+
+    bindEvents() {
+        try {
+            document.getElementById('joinBtn').addEventListener('click', () => this.joinRoom());
+            document.getElementById('resetBtn').addEventListener('click', () => this.showResetConfirm());
+            document.getElementById('cancelReset').addEventListener('click', () => this.hideResetConfirm());
+            document.getElementById('confirmReset').addEventListener('click', () => this.resetGame());
+            document.getElementById('startSymbolBtn').addEventListener('click', () => this.startNewMatch());
+
+            document.getElementById('sendChatBtn').addEventListener('click', () => this.sendChat());
+            this.els.chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.sendChat(); } });
+            this.els.chatInput.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value.length > 0) {
+                    if (!this.isTyping) {
+                        this.isTyping = true;
+                        this.sendTypingEvent(true);
+                        if (this.typingSendInterval) clearInterval(this.typingSendInterval);
+                        this.typingSendInterval = setInterval(() => { if (this.isTyping) this.sendTypingEvent(true); }, 1500);
+                    }
+                } else {
+                    this.stopTyping();
+                }
+            });
+            this.els.chatInput.addEventListener('blur', () => { this.stopTyping(); setTimeout(() => this.handleViewportChange(), 300); });
+            this.els.chatInput.addEventListener('focus', () => { setTimeout(() => this.handleViewportChange(), 300); });
+            this.els.chatMessages.addEventListener('scroll', Utils.throttle(() => {
+                const cm = this.els.chatMessages;
+                const isAtBottom = cm.scrollHeight - cm.scrollTop - cm.clientHeight < 50;
+                this.autoScrollEnabled = isAtBottom;
+                if (isAtBottom) { this.unreadCount = 0; this.updateUnreadBadge(); this.markMessagesAsSeen(); }
+            }, 200), { passive: true });
+
+            document.getElementById('profileBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('profileMenu').classList.toggle('active'); });
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('profileMenu');
+                const btn = document.getElementById('profileBtn');
+                if (menu && menu.classList.contains('active') && !btn.contains(e.target) && !menu.contains(e.target)) menu.classList.remove('active');
+                if (this.els.actionMenu && this.els.actionMenu.classList.contains('active') && !this.els.actionMenu.contains(e.target)) this.closeActionMenu();
+            });
+            document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+            document.getElementById('closeReplyBtn').addEventListener('click', () => this.cancelReply());
+        } catch (e) {}
+    },
+
+    sendTypingEvent(isTyping) { try { if (!this.backend) return; this.backend.send('typing', { username: this.username, typing: isTyping, timestamp: Date.now() }); } catch (e) {} },
+    stopTyping() { if (!this.isTyping) return; this.isTyping = false; if (this.typingSendInterval) { clearInterval(this.typingSendInterval); this.typingSendInterval = null; } this.sendTypingEvent(false); },
+    showTypingIndicator() {
+        try {
+            const indicator = this.els.typingIndicator;
+            if (!indicator) return;
+            indicator.classList.add('active');
+            if (this.autoScrollEnabled) requestAnimationFrame(() => { this.els.chatMessages.scrollTop = this.els.chatMessages.scrollHeight; });
+            if (this.remoteTypingTimeout) clearTimeout(this.remoteTypingTimeout);
+            this.remoteTypingTimeout = setTimeout(() => { indicator.classList.remove('active'); this.remoteTypingTimeout = null; }, 3500);
+        } catch (e) {}
+    },
+    hideTypingIndicator() { try { const i = this.els.typingIndicator; if (i) i.classList.remove('active'); if (this.remoteTypingTimeout) { clearTimeout(this.remoteTypingTimeout); this.remoteTypingTimeout = null; } } catch (e) {} },
+
+    setupGlobalPointerHandlers() {
+        const self = this;
+        const handleDown = (e) => {
+            if (!e.target.closest) return;
+            const wrapper = e.target.closest('.msg-wrapper');
+            if (!wrapper) return;
+            const msgId = wrapper.dataset.msgId;
+            if (!msgId) return;
+            const msgData = self.messagesMap[msgId];
+            if (!msgData || msgData.deleted) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const sX = touch.clientX, sY = touch.clientY;
+            self.globalSwipe.active = true; self.globalSwipe.startX = sX; self.globalSwipe.startY = sY;
+            self.globalSwipe.currentX = 0; self.globalSwipe.horizontalSwipe = false;
+            self.globalSwipe.targetWrapper = wrapper; self.globalSwipe.targetMsgId = msgId; self.globalSwipe.msgData = msgData;
+            self.globalLongPress.active = true; self.globalLongPress.startX = sX; self.globalLongPress.startY = sY;
+            self.globalLongPress.targetMsgId = msgId; self.globalLongPress.isMyMessage = msgData.isMe;
+            if (self.globalLongPress.timer) clearTimeout(self.globalLongPress.timer);
+            self.globalLongPress.timer = setTimeout(() => {
+                if (self.globalLongPress.active && !self.globalSwipe.horizontalSwipe) {
+                    self.showActionMenu({ clientX: sX, clientY: sY }, msgId, msgData.isMe);
+                    Utils.vibrate(30);
+                    self.globalLongPress.active = false;
+                }
+            }, 500);
+        };
+        const handleMove = (e) => {
+            if (!self.globalSwipe.active) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const dx = touch.clientX - self.globalSwipe.startX;
+            const dy = touch.clientY - self.globalSwipe.startY;
+            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) { if (self.globalLongPress.timer) { clearTimeout(self.globalLongPress.timer); self.globalLongPress.timer = null; } self.globalLongPress.active = false; }
+            if (!self.globalSwipe.horizontalSwipe && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) self.globalSwipe.horizontalSwipe = true;
+            if (!self.globalSwipe.horizontalSwipe) return;
+            if (dx < 0) {
+                const cx = Math.max(dx, -80);
+                self.globalSwipe.currentX = cx;
+                if (self.globalSwipe.targetWrapper) {
+                    self.globalSwipe.targetWrapper.style.transition = 'none';
+                    self.globalSwipe.targetWrapper.style.transform = `translateX(${cx}px)`;
+                    if (Math.abs(cx) > 60) self.globalSwipe.targetWrapper.classList.add('swiping');
+                    else self.globalSwipe.targetWrapper.classList.remove('swiping');
+                }
+            }
+        };
+        const handleUp = () => {
+            if (self.globalLongPress.timer) { clearTimeout(self.globalLongPress.timer); self.globalLongPress.timer = null; }
+            self.globalLongPress.active = false;
+            if (self.globalSwipe.active && self.globalSwipe.targetWrapper) {
+                const wrapper = self.globalSwipe.targetWrapper;
+                if (self.globalSwipe.horizontalSwipe && Math.abs(self.globalSwipe.currentX) > 60 && self.globalSwipe.msgData && !self.globalSwipe.msgData.deleted) self.startReply(self.globalSwipe.targetMsgId);
+                wrapper.style.transition = 'transform 0.2s ease';
+                wrapper.style.transform = 'translateX(0)';
+                wrapper.classList.remove('swiping');
+                setTimeout(() => { if (wrapper) wrapper.style.transition = ''; }, 200);
+            }
+            self.globalSwipe.active = false; self.globalSwipe.targetWrapper = null;
+            self.globalSwipe.targetMsgId = null; self.globalSwipe.msgData = null;
+            self.globalSwipe.currentX = 0; self.globalSwipe.horizontalSwipe = false;
+        };
+        document.addEventListener('touchstart', handleDown, { passive: true });
+        document.addEventListener('touchmove', handleMove, { passive: true });
+        document.addEventListener('touchend', handleUp, { passive: true });
+        document.addEventListener('touchcancel', handleUp, { passive: true });
+        document.addEventListener('mousedown', handleDown);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleUp);
+        this.cleanupHandlers.push(() => {
+            document.removeEventListener('touchstart', handleDown); document.removeEventListener('touchmove', handleMove);
+            document.removeEventListener('touchend', handleUp); document.removeEventListener('touchcancel', handleUp);
+            document.removeEventListener('mousedown', handleDown); document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('mouseup', handleUp);
+        });
+    },
+
+    setupActionMenu() {
+        try {
+            const menu = this.els.actionMenu;
+            if (!menu) return;
+            menu.querySelectorAll('.reaction-option').forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this.selectedMessageId) this.sendReaction(this.selectedMessageId, opt.dataset.reaction);
+                    this.closeActionMenu();
+                });
+            });
+            const del = document.getElementById('deleteMsgOption');
+            if (del) del.addEventListener('click', (e) => { e.stopPropagation(); if (this.selectedMessageId) this.deleteMessage(this.selectedMessageId); this.closeActionMenu(); });
+        } catch (e) {}
+    },
+
+    showActionMenu(e, msgId, isMy) {
+        try {
+            this.selectedMessageId = msgId;
+            const menu = this.els.actionMenu;
+            const del = document.getElementById('deleteMsgOption');
+            if (del) del.style.display = isMy ? 'flex' : 'none';
+            const x = e.clientX || 0, y = e.clientY || 0;
+            menu.style.position = 'fixed';
+            menu.classList.add('active');
+            const rect = menu.getBoundingClientRect();
+            const mw = rect.width || 240, mh = rect.height || 100;
+            let left = x - mw / 2, top = y - mh - 20;
+            left = Math.max(10, Math.min(left, window.innerWidth - mw - 10));
+            if (top < 60) top = y + 20;
+            if (top + mh > window.innerHeight - 20) top = window.innerHeight - mh - 20;
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+        } catch (err) {}
+    },
+
+    closeActionMenu() { if (this.els.actionMenu) this.els.actionMenu.classList.remove('active'); this.selectedMessageId = null; },
+
+    sendReaction(messageId, reaction) {
+        try {
+            update(ref(database, `rooms/${this.roomId}/messages/${messageId}`), { reaction: reaction, reactionBy: this.username });
+            this.applyReaction(messageId, reaction);
+            Utils.vibrate(20);
+        } catch (e) {}
+    },
+
+    applyReaction(messageId, reaction) {
+        try {
+            const wrapper = this.els.chatMessages.querySelector(`[data-msg-id="${messageId}"]`);
+            if (!wrapper) return;
+            const msgEl = wrapper.querySelector('.msg');
+            if (!msgEl) return;
+            let badge = msgEl.querySelector('.reaction-badge');
+            if (!badge) { badge = document.createElement('div'); badge.className = 'reaction-badge'; msgEl.appendChild(badge); }
+            badge.textContent = reaction;
+            if (!this.messagesMap[messageId]) this.messagesMap[messageId] = {};
+            this.messagesMap[messageId].reaction = reaction;
+        } catch (e) {}
+    },
+
+    async deleteMessage(messageId) {
+        try {
+            const msgData = this.messagesMap[messageId];
+            if (!msgData || !msgData.isMe) { Utils.showToast('You can only delete your own messages', 'error'); return; }
+            await update(ref(database, `rooms/${this.roomId}/messages/${messageId}`), { deleted: true, deletedAt: serverTimestamp() });
+            this.applyMessageDelete(messageId);
+            Utils.vibrate(30);
+            Utils.showToast('Message deleted', 'info', 1500);
+        } catch (e) {}
+    },
+
+    applyMessageDelete(messageId) {
+        try {
+            const wrapper = this.els.chatMessages.querySelector(`[data-msg-id="${messageId}"]`);
+            if (!wrapper) return;
+            const msgEl = wrapper.querySelector('.msg');
+            if (!msgEl) return;
+            const msgData = this.messagesMap[messageId] || {};
+            msgEl.innerHTML = '';
+            msgEl.classList.add('deleted');
+            const notice = document.createElement('span');
+            notice.className = 'msg-text';
+            notice.textContent = '🚫 This message was deleted';
+            msgEl.appendChild(notice);
+            const footer = document.createElement('span');
+            footer.className = 'msg-footer';
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'msg-time';
+            timeSpan.textContent = Utils.formatTime12h(msgData.timestamp || Date.now());
+            footer.appendChild(timeSpan);
+            msgEl.appendChild(footer);
+            if (!this.messagesMap[messageId]) this.messagesMap[messageId] = {};
+            this.messagesMap[messageId].deleted = true;
+            this.messagesMap[messageId].text = 'This message was deleted';
+        } catch (e) {}
+    },
+
+    setupSplitter() {
+        const splitter = this.els.splitter;
+        if (!splitter) return;
+        const onStart = (e) => {
+            if (this.isDragging) return;
+            if (e.type === 'mousedown' && e.button !== 0) return;
+            e.preventDefault();
+            this.isDragging = true;
+            this.els.splitter.classList.add('active');
+            this.els.splitContainer.classList.add('dragging');
+            const touch = e.touches ? e.touches[0] : e;
+            this.dragStartY = touch.clientY;
+            this.dragStartGameHeight = this.els.gamePanel.getBoundingClientRect().height;
+            this.dragStartChatHeight = this.els.chatPanel.getBoundingClientRect().height;
+            Utils.vibrate(15);
+        };
+        const onMove = (e) => {
+            if (!this.isDragging) return;
+            e.preventDefault();
+            const touch = e.touches ? e.touches[0] : e;
+            const deltaY = touch.clientY - this.dragStartY;
+            if (this.dragRafId) cancelAnimationFrame(this.dragRafId);
+            this.dragRafId = requestAnimationFrame(() => this.updateSplitPosition(deltaY));
+        };
+        const onEnd = () => {
+            if (!this.isDragging) return;
+            this.isDragging = false;
+            this.els.splitter.classList.remove('active');
+            this.els.splitContainer.classList.remove('dragging');
+            if (this.dragRafId) { cancelAnimationFrame(this.dragRafId); this.dragRafId = null; }
+            try { localStorage.setItem('ttt_split_ratio', this.gamePanelRatio.toString()); } catch (e) {}
+        };
+        splitter.addEventListener('touchstart', onStart, { passive: false });
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd, { passive: true });
+        document.addEventListener('touchcancel', onEnd, { passive: true });
+        splitter.addEventListener('mousedown', onStart);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        this.cleanupHandlers.push(() => {
+            splitter.removeEventListener('touchstart', onStart);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
+            document.removeEventListener('touchcancel', onEnd);
+            splitter.removeEventListener('mousedown', onStart);
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+        });
+    },
+
+    updateSplitPosition(deltaY) {
+        try {
+            const ch = this.els.splitContainer.getBoundingClientRect().height;
+            const sh = this.els.splitter.getBoundingClientRect().height || 14;
+            const avail = ch - sh;
+            let ng = this.dragStartGameHeight + deltaY;
+            let nc = this.dragStartChatHeight - deltaY;
+            if (ng < this.minGameHeight) { ng = this.minGameHeight; nc = avail - this.minGameHeight; }
+            if (nc < this.minChatHeight) { nc = this.minChatHeight; ng = avail - this.minChatHeight; }
+            this.els.gamePanel.style.flexBasis = ((ng / avail) * 100) + '%';
+            this.els.chatPanel.style.flexBasis = ((nc / avail) * 100) + '%';
+            this.gamePanelRatio = ng / avail;
+        } catch (e) {}
+    },
+
+    applySplitRatio() {
+        if (this.isDragging) return;
+        if (!this.els.splitContainer || this.els.splitContainer.style.display === 'none') return;
+        try {
+            const ch = this.els.splitContainer.getBoundingClientRect().height;
+            const sh = this.els.splitter.getBoundingClientRect().height || 14;
+            const avail = ch - sh;
+            const gh = avail * this.gamePanelRatio;
+            const chh = avail - gh;
+            this.els.gamePanel.style.flexBasis = (gh / avail * 100) + '%';
+            this.els.chatPanel.style.flexBasis = (chh / avail * 100) + '%';
+        } catch (e) {}
+    },
+
+    async joinRoom() {
+        const user = document.getElementById('usernameInput').value.trim();
+        const room = document.getElementById('roomInput').value.trim().toUpperCase();
+        if (!user || !room) { Utils.showToast('Please enter both username and room code', 'error'); return; }
+        if (user.length < 2) { Utils.showToast('Username must be at least 2 characters', 'error'); return; }
+        try {
+            localStorage.setItem('ttt_username', user);
+            localStorage.setItem('ttt_room', room);
+            this.username = user;
+            this.roomId = room;
+            this.backend = new FirebaseBackend(room);
+            this.messagesRef = ref(database, `rooms/${room}/messages`);
+
+            const playersRef = ref(database, `rooms/${room}/players`);
+            const snapshot = await get(playersRef);
+            const players = snapshot.val() || {};
+            const existing = Object.keys(players);
+
+            if (existing.length >= 2 && !players[this.username]) {
+                Utils.showToast('Room is full! Try a different code.', 'error');
+                localStorage.removeItem('ttt_username');
+                localStorage.removeItem('ttt_room');
+                return;
+            }
+            if (players[this.username] && players[this.username].symbol) this.playerSymbol = players[this.username].symbol;
+            else this.playerSymbol = (existing.length === 0) ? 'X' : 'O';
+
+            await set(ref(database, `rooms/${room}/players/${this.username}`), { symbol: this.playerSymbol, online: true, joinedAt: serverTimestamp() });
+            onDisconnect(ref(database, `rooms/${room}/players/${this.username}`)).update({ online: false, lastSeen: serverTimestamp() });
+
+            if (this.playerSymbol === 'X') {
+                const turnRef = ref(database, `rooms/${room}/currentTurn`);
+                const tSnap = await get(turnRef);
+                if (!tSnap.val()) await set(turnRef, 'X');
+            }
+
+            this.els.lobby.style.display = 'none';
+            this.els.topBar.style.display = 'flex';
+            this.els.splitContainer.style.display = 'flex';
+            this.els.boardOverlay.classList.add('active');
+
+            document.getElementById('profileName').textContent = user;
+            document.getElementById('profileRoom').textContent = `Room: ${room}`;
+            if (this.els.myOnlineDot) this.els.myOnlineDot.className = 'online-dot online';
+
+            try {
+                const sr = localStorage.getItem('ttt_split_ratio');
+                if (sr) { const r = parseFloat(sr); if (!isNaN(r) && r >= 0.2 && r <= 0.8) this.gamePanelRatio = r; }
+            } catch (e) {}
+
+            requestAnimationFrame(() => {
+                this.handleViewportChange();
+                this.applySplitRatio();
+                setTimeout(() => this.applySplitRatio(), 50);
+                setTimeout(() => this.applySplitRatio(), 200);
+                setTimeout(() => this.applySplitRatio(), 500);
+            });
+
+            this.setupPlayersListener();
+            this.setupBackendListeners();
+            this.setupStatsListener();
+            this.setupMessagesListener();
+            setTimeout(() => { if (this.autoScrollEnabled) this.markMessagesAsSeen(); }, 1500);
+
+            Utils.showToast(`Joined room ${room} as ${this.playerSymbol}`, 'success');
+            this.addSystemMessage(`You joined room ${room} as ${this.playerSymbol}`);
+        } catch (error) {
+            console.error('Join room error:', error);
+            Utils.showToast('Failed to join room. Check connection.', 'error');
+        }
+    },
+
+    setupMessagesListener() {
+        try {
+            if (this.messagesListenerUnsub) { try { this.messagesListenerUnsub(); } catch (e) {} this.messagesListenerUnsub = null; }
+            this.messagesListenerUnsub = onValue(this.messagesRef, (snapshot) => {
+                const messages = snapshot.val() || {};
+                const sorted = Object.values(messages).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                sorted.forEach(msg => {
+                    if (!msg || !msg.id) return;
+                    const existing = this.messagesMap[msg.id];
+                    if (!existing) {
+                        this.renderMessageFromFirebase(msg);
+                    } else {
+                        if (msg.deleted && !existing.deleted) this.applyMessageDelete(msg.id);
+                        else if (msg.status && existing.status !== msg.status) { this.updateMessageStatusUI(msg.id, msg.status); existing.status = msg.status; }
+                        if (msg.reaction && existing.reaction !== msg.reaction) { this.applyReaction(msg.id, msg.reaction); existing.reaction = msg.reaction; }
+                    }
+                    if (msg.username !== this.username && msg.status === 'sent' && !this.deliveredMarked.has(msg.id)) {
+                        this.deliveredMarked.add(msg.id);
+                        this.markAsDelivered(msg.id);
+                    }
+                });
+                if (document.visibilityState === 'visible' && document.hasFocus() && this.autoScrollEnabled) this.markMessagesAsSeen();
+                const keys = Object.keys(this.messagesMap);
+                if (keys.length > this.maxMessageMapSize) { const toDel = keys.slice(0, keys.length - this.maxMessageMapSize); toDel.forEach(k => delete this.messagesMap[k]); }
+            });
+        } catch (e) {}
+    },
+
+    renderMessageFromFirebase(msg) {
+        try {
+            const container = this.els.chatMessages;
+            this.messagesMap[msg.id] = {
+                user: msg.username,
+                text: msg.deleted ? 'This message was deleted' : msg.message,
+                isMe: msg.username === this.username,
+                timestamp: msg.timestamp,
+                replyTo: msg.replyTo,
+                deleted: !!msg.deleted,
+                status: msg.status || 'sent',
+                reaction: msg.reaction
+            };
+            const wrapper = this.createMessageElement(msg);
+            container.appendChild(wrapper);
+            if (this.autoScrollEnabled) requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+            if (msg.username !== this.username) {
+                Utils.vibrate(20);
+                if (!document.hasFocus() || document.visibilityState !== 'visible') { this.unreadCount++; this.updateUnreadBadge(); }
+            }
+            while (container.children.length > this.maxMessages) {
+                const first = container.firstChild;
+                if (first && first.dataset && first.dataset.msgId) delete this.messagesMap[first.dataset.msgId];
+                container.removeChild(first);
+            }
+        } catch (e) { console.error('Render message error:', e); }
+    },
+
+    createMessageElement(msg) {
+        const isMe = msg.username === this.username;
+        const isDeleted = !!msg.deleted;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper ${isMe ? 'me' : 'them'}`;
+        wrapper.dataset.msgId = msg.id;
+
+        const swipe = document.createElement('div');
+        swipe.className = 'swipe-reply-indicator';
+        swipe.textContent = '↩';
+        wrapper.appendChild(swipe);
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg ${isMe ? 'me' : 'them'} ${isDeleted ? 'deleted' : ''}`;
+
+        if (msg.replyTo && !isDeleted) {
+            const quote = document.createElement('div');
+            quote.className = 'reply-quote';
+            const qn = document.createElement('span');
+            qn.className = 'reply-name';
+            qn.textContent = msg.replyTo.name;
+            const qt = document.createElement('span');
+            qt.className = 'reply-text';
+            qt.textContent = msg.replyTo.text;
+            quote.appendChild(qn);
+            quote.appendChild(qt);
+            msgDiv.appendChild(quote);
+        }
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'msg-text';
+        textSpan.textContent = isDeleted ? '🚫 This message was deleted' : msg.message;
+        msgDiv.appendChild(textSpan);
+
+        // WhatsApp-style inline footer (time + ticks)
+        const footer = document.createElement('span');
+        footer.className = 'msg-footer';
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'msg-time';
+        timeSpan.textContent = Utils.formatTime12h(msg.timestamp);
+        footer.appendChild(timeSpan);
+
+        if (isMe && !isDeleted) {
+            const status = document.createElement('span');
+            status.className = 'msg-status';
+            status.dataset.statusFor = msg.id;
+            status.classList.add(msg.status || 'sent');
+            status.innerHTML = `<span class="tick tick-1">${TICK_SVG}</span><span class="tick tick-2">${TICK_SVG}</span>`;
+            footer.appendChild(status);
+        }
+
+        msgDiv.appendChild(footer);
+        wrapper.appendChild(msgDiv);
+
+        if (msg.reaction && !isDeleted) {
+            const badge = document.createElement('div');
+            badge.className = 'reaction-badge';
+            badge.textContent = msg.reaction;
+            msgDiv.appendChild(badge);
+        }
+
+        return wrapper;
+    },
+
+    updateMessageStatusUI(messageId, status) {
+        try {
+            const statusEl = this.els.chatMessages.querySelector(`[data-status-for="${messageId}"]`);
+            if (!statusEl) return;
+            statusEl.className = 'msg-status ' + status;
+        } catch (e) {}
+    },
+
+    async markAsDelivered(messageId) {
+        try { await update(ref(database, `rooms/${this.roomId}/messages/${messageId}`), { status: 'delivered', deliveredAt: serverTimestamp() }); } catch (e) {}
+    },
+
+    async markMessagesAsSeen() {
+        try {
+            if (!this.roomId || !this.username || !this.messagesMap) return;
+            const toMark = [];
+            for (const [id, data] of Object.entries(this.messagesMap)) {
+                if (data.user !== this.username && !data.deleted && data.status !== 'seen' && !this.seenMarked.has(id)) toMark.push(id);
+            }
+            if (toMark.length === 0) return;
+            for (const id of toMark) {
+                this.seenMarked.add(id);
+                try { await update(ref(database, `rooms/${this.roomId}/messages/${id}`), { status: 'seen', seenAt: serverTimestamp() }); } catch (e) {}
+            }
+        } catch (e) {}
+    },
+
+    setupPlayersListener() {
+        try {
+            const playersRef = ref(database, `rooms/${this.roomId}/players`);
+            const unsub = onValue(playersRef, (snapshot) => {
+                try {
+                    const pd = snapshot.val() || {};
+                    const oldOpp = this.opponentName;
+                    this.players = pd;
+                    const names = Object.keys(pd);
+                    const opp = names.find(n => n !== this.username);
+                    this.opponentName = opp || 'Waiting...';
+                    const oppData = pd[this.opponentName];
+                    this.opponentOnline = (oppData && oppData.online) ? true : false;
+                    if (oldOpp === 'Waiting...' && opp) { this.addSystemMessage(`${opp} joined the room!`); Utils.showToast(`${opp} joined!`, 'success'); }
+                    else if (oldOpp !== 'Waiting...' && !opp) {
+                        this.addSystemMessage(`${oldOpp} left the room.`);
+                        if (this.audioManager && this.audioManager.isAudioOn) { this.audioManager.stop(false); this.els.audioCodeInput.value = ''; }
+                        this.hideTypingIndicator();
+                    }
+                    if (pd[this.username] && pd[this.username].symbol) this.playerSymbol = pd[this.username].symbol;
+                    this.updateOpponentUI();
+                } catch (e) {}
+            });
+            this.listeners.push(unsub);
+
+            const turnRef = ref(database, `rooms/${this.roomId}/currentTurn`);
+            const turnUnsub = onValue(turnRef, (snapshot) => {
+                try {
+                    const currentTurn = snapshot.val() || 'X';
+                    if (this.playerSymbol && this.matchStarted) {
+                        const wasMyTurn = this.isMyTurn;
+                        this.isMyTurn = (this.playerSymbol === currentTurn);
+                        this.updateTurnUI();
+                        if (this.isMyTurn && !wasMyTurn) Utils.vibrate(30);
+                    }
+                } catch (e) {}
+            });
+            this.listeners.push(turnUnsub);
+        } catch (e) {}
+    },
+
+    updateOpponentUI() {
+        try {
+            document.getElementById('profileOpponent').textContent = this.opponentName;
+            if (this.els.profileOpponentDot) {
+                const on = this.opponentName !== 'Waiting...' && this.opponentOnline;
+                this.els.profileOpponentDot.className = 'status-dot ' + (on ? 'online' : 'offline');
+                this.els.profileOpponentDot.style.background = on ? 'var(--success)' : 'var(--secondary)';
+                this.els.profileOpponentDot.style.boxShadow = on ? '0 0 8px var(--success)' : '0 0 8px var(--secondary)';
+            }
+        } catch (e) {}
+    },
+
+    setupStatsListener() {
+        try {
+            const statsRef = ref(database, `rooms/${this.roomId}/stats`);
+            const unsub = onValue(statsRef, (snapshot) => {
+                try {
+                    const s = snapshot.val() || { total: 0, xWins: 0, oWins: 0 };
+                    this.stats = s;
+                    document.getElementById('statTotal').textContent = s.total || 0;
+                    document.getElementById('statXWins').textContent = s.xWins || 0;
+                    document.getElementById('statOWins').textContent = s.oWins || 0;
+                } catch (e) {}
+            });
+            this.listeners.push(unsub);
+        } catch (e) {}
+    },
+
+    setupBackendListeners() {
+        try {
+            this.backend.on('move', (data) => { if (data.player !== this.username) { this.board[data.index] = data.symbol; this.renderBoard(); this.checkWin(data.symbol); Utils.vibrate(20); } });
+            this.backend.on('match_started', (data) => { if (data.starter !== this.username) this.handleMatchStarted(data); });
+            this.backend.on('reset', () => { this.autoResetBoard(); this.addSystemMessage('Board was reset'); });
+            this.backend.on('typing', (data) => { if (data.username === this.username) return; if (data.typing) this.showTypingIndicator(); else this.hideTypingIndicator(); });
+            this.backend.on('win', (data) => { if (data.winner !== this.username) this.addSystemMessage(`${data.winner} won this round!`); });
+            this.backend.on('audio_start', (data) => { if (data.by !== this.username) this.audioManager.handleOpponentStart(data); });
+            this.backend.on('audio_stop', (data) => { if (data.by !== this.username) this.audioManager.handleOpponentStop(data); });
+        } catch (e) {}
+    },
+
+    async startNewMatch() {
+        try {
+            if (!this.backend || !this.roomId) return;
+            if (this.matchStarted) return;
+            if (this.opponentName === 'Waiting...') { Utils.showToast('Waiting for opponent to join...', 'warning'); return; }
+            this.board = Array(9).fill(null);
+            this.renderBoard();
+            this.gameOver = false;
+            this.matchStarted = true;
+            await set(ref(database, `rooms/${this.roomId}/players/${this.username}/symbol`), 'X');
+            await set(ref(database, `rooms/${this.roomId}/players/${this.opponentName}/symbol`), 'O');
+            this.playerSymbol = 'X';
+            await set(ref(database, `rooms/${this.roomId}/currentTurn`), 'X');
+            this.els.boardOverlay.classList.remove('active');
+            this.isMyTurn = true;
+            this.updateTurnUI();
+            this.backend.send('match_started', { starter: this.username, symbol: 'X' });
+            this.addSystemMessage(`New match started! You go first (X).`);
+            Utils.showToast('Match started! Your turn', 'success');
+        } catch (e) {}
+    },
+
+    handleMatchStarted() {
+        this.board = Array(9).fill(null);
+        this.renderBoard();
+        this.gameOver = false;
+        this.matchStarted = true;
+        this.playerSymbol = 'O';
+        this.isMyTurn = false;
+        this.els.boardOverlay.classList.remove('active');
+        this.updateTurnUI();
+        this.addSystemMessage(`New match started! Opponent goes first (X).`);
+    },
+
+    renderBoard() {
+        try {
+            const boardEl = this.els.board;
+            const overlay = this.els.boardOverlay;
+            const existingCells = boardEl.querySelectorAll('.cell');
+            existingCells.forEach(c => c.remove());
+            if (overlay.parentNode !== boardEl) boardEl.insertBefore(overlay, boardEl.firstChild);
+            const frag = document.createDocumentFragment();
+            this.board.forEach((val, i) => {
+                const cell = document.createElement('div');
+                cell.className = `cell ${val ? val.toLowerCase() : ''}`;
+                cell.textContent = val || '';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => this.handleCellClick(i));
+                frag.appendChild(cell);
+            });
+            boardEl.appendChild(frag);
+        } catch (e) {}
+    },
+
+    handleCellClick(index) {
+        try {
+            if (!this.matchStarted || this.gameOver || !this.isMyTurn || this.board[index] || !this.playerSymbol) return;
+            this.board[index] = this.playerSymbol;
+            this.renderBoard();
+            this.backend.send('move', { index, symbol: this.playerSymbol, player: this.username });
+            const nextTurn = (this.playerSymbol === 'X') ? 'O' : 'X';
+            set(ref(database, `rooms/${this.roomId}/currentTurn`), nextTurn);
+            Utils.vibrate(30);
+            this.checkWin(this.playerSymbol);
+        } catch (e) {}
+    },
+
+    async checkWin(symbol) {
+        try {
+            const patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let pattern of patterns) {
+                const [a,b,c] = pattern;
+                if (this.board[a] === symbol && this.board[b] === symbol && this.board[c] === symbol) {
+                    this.gameOver = true;
+                    this.matchStarted = false;
+                    this.highlightWin(pattern);
+                    const winner = (symbol === this.playerSymbol) ? this.username : this.opponentName;
+                    const isMe = (symbol === this.playerSymbol);
+                    try {
+                        const statsRef = ref(database, `rooms/${this.roomId}/stats`);
+                        const snap = await get(statsRef);
+                        const s = snap.val() || { total: 0, xWins: 0, oWins: 0 };
+                        s.total = (s.total || 0) + 1;
+                        if (symbol === 'X') s.xWins = (s.xWins || 0) + 1;
+                        else s.oWins = (s.oWins || 0) + 1;
+                        await set(statsRef, s);
+                    } catch (e) {}
+                    this.addSystemMessage(`${winner} Wins! 🎉`);
+                    Utils.showToast(isMe ? '🎉 You Win!' : `${winner} Wins!`, isMe ? 'success' : 'warning');
+                    Utils.vibrate(isMe ? [100,50,100] : 50);
+                    this.backend.send('win', { winner, symbol });
+                    setTimeout(() => {
+                        this.els.boardOverlay.innerHTML = `<div class="board-overlay-text"><span class="icon-big">${isMe ? '🏆' : '😢'}</span><strong>${isMe ? 'You Win!' : `${winner} Wins!`}</strong>Click 🔄 to start a new match</div>`;
+                        this.els.boardOverlay.classList.add('active');
+                    }, 1500);
+                    return;
+                }
+            }
+            if (!this.board.includes(null)) {
+                this.gameOver = true;
+                this.matchStarted = false;
+                try {
+                    const statsRef = ref(database, `rooms/${this.roomId}/stats`);
+                    const snap = await get(statsRef);
+                    const s = snap.val() || { total: 0, xWins: 0, oWins: 0 };
+                    s.total = (s.total || 0) + 1;
+                    await set(statsRef, s);
+                } catch (e) {}
+                this.addSystemMessage("It's a Draw! 🤝");
+                Utils.showToast("It's a Draw!", 'info');
+                setTimeout(() => {
+                    this.els.boardOverlay.innerHTML = `<div class="board-overlay-text"><span class="icon-big">🤝</span><strong>It's a Draw!</strong>Click 🔄 to start a new match</div>`;
+                    this.els.boardOverlay.classList.add('active');
+                }, 1500);
+            }
+        } catch (e) {}
+    },
+
+    highlightWin(pattern) {
+        try {
+            const cells = document.querySelectorAll('.cell');
+            pattern.forEach(i => { if (cells[i]) cells[i].classList.add('win'); });
+        } catch (e) {}
+    },
+
+    showResetConfirm() { document.getElementById('confirmModal').classList.add('active'); },
+    hideResetConfirm() { document.getElementById('confirmModal').classList.remove('active'); },
+
+    resetGame() {
+        try {
+            if (!this.backend) return;
+            this.hideResetConfirm();
+            this.board = Array(9).fill(null);
+            this.renderBoard();
+            this.gameOver = true;
+            this.matchStarted = false;
+            this.els.boardOverlay.innerHTML = `<div class="board-overlay-text"><span class="icon-big">⏳</span><strong>Waiting to Start</strong>Click the 🔄 symbol above to start a new match</div>`;
+            this.els.boardOverlay.classList.add('active');
+            set(ref(database, `rooms/${this.roomId}/currentTurn`), 'X');
+            this.backend.send('reset', {});
+            this.updateTurnUI();
+            this.addSystemMessage('Board reset');
+        } catch (e) {}
+    },
+
+    autoResetBoard() {
+        try {
+            this.board = Array(9).fill(null);
+            this.renderBoard();
+            this.gameOver = true;
+            this.matchStarted = false;
+            this.els.boardOverlay.innerHTML = `<div class="board-overlay-text"><span class="icon-big">⏳</span><strong>Waiting to Start</strong>Click the 🔄 symbol above to start a new match</div>`;
+            this.els.boardOverlay.classList.add('active');
+            this.updateTurnUI();
+        } catch (e) {}
+    },
+
+    updateTurnUI() {
+        try {
+            const ind = this.els.turnIndicator;
+            if (!this.matchStarted || this.gameOver) { ind.textContent = "Waiting"; ind.className = 'turn-indicator waiting'; return; }
+            if (!this.playerSymbol) { ind.textContent = "Loading..."; ind.className = 'turn-indicator waiting'; return; }
+            if (this.isMyTurn) { ind.textContent = "Your Turn"; ind.className = 'turn-indicator your-turn'; }
+            else { ind.textContent = "Opponent's Turn"; ind.className = 'turn-indicator opp-turn'; }
+        } catch (e) {}
+    },
+
+    sendChat() {
+        try {
+            const input = this.els.chatInput;
+            const msg = input.value.trim();
+            if (!msg) return;
+            if (msg.length > 200) { Utils.showToast('Message too long', 'error'); return; }
+            this.stopTyping();
+            const msgId = Utils.generateId();
+            const timestamp = Date.now();
+            const payload = { id: msgId, username: this.username, message: msg, timestamp, status: 'sent' };
+            if (this.replyingTo) {
+                payload.replyTo = { id: this.replyingTo.id, name: this.replyingTo.name, text: this.replyingTo.text };
+            }
+            try {
+                set(ref(database, `rooms/${this.roomId}/messages/${msgId}`), payload);
+            } catch (e) {
+                console.error('Send message error:', e);
+                this.renderMessageFromFirebase(payload);
+            }
+            input.value = '';
+            this.cancelReply();
+            Utils.vibrate(15);
+        } catch (e) {}
+    },
+
+    startReply(msgId) {
+        try {
+            const msgData = this.messagesMap[msgId];
+            if (!msgData || msgData.deleted) return;
+            this.replyingTo = { id: msgId, name: msgData.isMe ? 'You' : msgData.user, text: msgData.text };
+            this.els.replyPreviewName.textContent = `Replying to ${this.replyingTo.name}`;
+            this.els.replyPreviewText.textContent = this.replyingTo.text;
+            this.els.replyPreview.classList.add('active');
+            this.els.chatInput.focus();
+            Utils.vibrate(20);
+        } catch (e) {}
+    },
+
+    cancelReply() { this.replyingTo = null; this.els.replyPreview.classList.remove('active'); },
+
+    addSystemMessage(text) {
+        try {
+            const container = this.els.chatMessages;
+            const div = document.createElement('div');
+            div.className = 'msg system';
+            div.textContent = text;
+            container.appendChild(div);
+            if (this.autoScrollEnabled) requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+            while (container.children.length > this.maxMessages) container.removeChild(container.firstChild);
+        } catch (e) {}
+    },
+
+    updateUnreadBadge() {
+        try {
+            const badge = this.els.unreadBadge;
+            if (!badge) return;
+            if (this.unreadCount > 0) { badge.textContent = this.unreadCount > 9 ? '9+' : this.unreadCount; badge.classList.add('active'); }
+            else badge.classList.remove('active');
+        } catch (e) {}
+    },
+
+    setOffline() { if (!this.roomId || !this.username) return; try { set(ref(database, `rooms/${this.roomId}/players/${this.username}/online`), false); } catch (e) {} },
+
+    async logout() {
+        try {
+            this.stopTyping();
+            if (this.audioManager) await this.audioManager.stop();
+            this.setOffline();
+            localStorage.removeItem('ttt_username');
+            localStorage.removeItem('ttt_room');
+            window.location.reload();
+        } catch (e) {}
+    }
+};
+
+App.init();
+</script>
+</body>
+</html>
