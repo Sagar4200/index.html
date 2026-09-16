@@ -27,7 +27,6 @@ body{background:var(--bg);color:var(--text);display:flex;justify-content:center;
 .chat-messages::-webkit-scrollbar-thumb{background:var(--surface-light);border-radius:3px}
 .chat-messages::-webkit-scrollbar-thumb:hover{background:var(--primary)}
 
-/* LOBBY */
 .lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px 10px;height:100%;overflow-y:auto}
 .lobby-logo{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;justify-content:center;align-items:center;font-size:2.5rem;box-shadow:var(--shadow-glow);animation:pulseLogo 2s ease infinite}
 @keyframes pulseLogo{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
@@ -45,7 +44,6 @@ button:active{transform:translateY(0) scale(.98)}
 button:disabled{opacity:.4;cursor:not-allowed}
 .btn-danger{background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));color:#fff}
 
-/* TOP BAR */
 .top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;gap:6px;padding:2px 0;flex-shrink:0}
 .profile-container{position:relative;z-index:100;flex-shrink:0}
 .profile-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#000;font-size:1rem;display:flex;justify-content:center;align-items:center;cursor:pointer;border:2px solid rgba(255,255,255,.2);box-shadow:0 4px 15px rgba(0,210,255,.3);padding:0;font-weight:700;position:relative}
@@ -59,7 +57,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 @keyframes glowAudio{0%,100%{box-shadow:0 0 8px rgba(46,204,113,.3)}50%{box-shadow:0 0 16px rgba(46,204,113,.6)}}
 .audio-indicator .live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulseDot 1s infinite}
 
-/* PROFILE MENU */
 .profile-menu{position:absolute;top:46px;left:0;background:var(--surface-light);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-lg);min-width:280px;overflow:hidden;display:none;z-index:200;max-height:calc(100vh - 90px);overflow-y:auto}
 .profile-menu.active{display:block;animation:menuSlide .2s ease}
 @keyframes menuSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
@@ -79,7 +76,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .audio-code-input.active{border-color:var(--success);box-shadow:0 0 0 3px rgba(46,204,113,.15);color:var(--success)}
 .audio-code-input.error{border-color:var(--secondary);animation:shake .4s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.audio-status{font-size:.7rem;color:var(--text-muted);margin-top:8px;text-align:center;min-height:16px}
+.audio-status{font-size:.7rem;color:var(--text-muted);margin-top:8px;text-align:center;min-height:16px;line-height:1.4}
 .audio-status.active{color:var(--success)}
 .audio-status.error{color:var(--secondary)}
 
@@ -103,7 +100,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .profile-menu-item:hover{background:rgba(255,255,255,.05)}
 .profile-menu-item.danger{color:var(--secondary)}
 
-/* SPLIT */
 .split-container{display:flex;flex-direction:column;flex:1;width:100%;min-height:0;overflow:hidden}
 .game-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;overflow:hidden;flex-shrink:0;padding:4px 0;flex-basis:50%;min-height:0}
 .splitter{height:14px;width:100%;flex-shrink:0;display:flex;justify-content:center;align-items:center;cursor:row-resize;position:relative;touch-action:none;z-index:50;margin:1px 0}
@@ -116,7 +112,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .chat-panel{flex:1;min-height:140px;display:flex;flex-direction:column;background:var(--wa-chat-bg);border-radius:var(--radius-lg);padding:0;border:1px solid var(--border);overflow:hidden;position:relative}
 .split-container.dragging .chat-panel,.split-container.dragging .game-panel,.split-container.dragging .splitter::before,.split-container.dragging .splitter-handle{transition:none !important}
 
-/* GAME */
 .board-wrapper{position:relative;width:100%;aspect-ratio:1;margin:0 auto;flex-shrink:0;max-height:100%}
 .board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--surface-light);padding:6px;border-radius:var(--radius-lg);width:100%;height:100%;border:1px solid var(--border);position:relative}
 .board-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,10,20,.92);display:none;justify-content:center;align-items:center;border-radius:var(--radius-lg);z-index:10;backdrop-filter:blur(4px);padding:12px;pointer-events:none}
@@ -142,7 +137,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .turn-indicator.waiting{border-color:var(--text-muted);background:rgba(136,136,160,.1);color:var(--text-muted)}
 .reset-btn{width:32px;height:32px;border-radius:50%;background:var(--surface-light);color:var(--secondary);font-size:.9rem;display:flex;justify-content:center;align-items:center;cursor:pointer;border:1px solid rgba(255,107,107,.3);padding:0;flex-shrink:0}
 
-/* CHAT */
 .sidebar-title{font-size:.75rem;font-weight:700;color:var(--primary);margin:8px 10px 4px 10px;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;line-height:1}
 .sidebar-title .unread-badge{background:var(--secondary);color:#fff;font-size:.6rem;padding:1px 6px;border-radius:8px;font-weight:700;display:none}
 .sidebar-title .unread-badge.active{display:inline-block}
@@ -154,28 +148,12 @@ button:disabled{opacity:.4;cursor:not-allowed}
 @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
 .chat-messages{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:3px;font-size:.9rem;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;min-height:0;background-color:var(--wa-chat-bg);background-image:radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px);background-size:20px 20px;background-position:0 0,10px 10px}
 
-/* DATE SEPARATOR */
-.date-separator{
-  align-self:center;
-  background:rgba(32,44,51,.85);
-  color:var(--text-muted);
-  font-size:.68rem;
-  padding:5px 14px;
-  border-radius:10px;
-  margin:10px 0 6px 0;
-  font-weight:600;
-  letter-spacing:.4px;
-  box-shadow:0 2px 6px rgba(0,0,0,.25);
-  text-transform:uppercase;
-  flex-shrink:0;
-  animation:dateFade .3s ease;
-}
+.date-separator{align-self:center;background:rgba(32,44,51,.85);color:var(--text-muted);font-size:.68rem;padding:5px 14px;border-radius:10px;margin:10px 0 6px 0;font-weight:600;letter-spacing:.4px;box-shadow:0 2px 6px rgba(0,0,0,.25);text-transform:uppercase;flex-shrink:0;animation:dateFade .3s ease}
 @keyframes dateFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 .msg-wrapper{display:flex;flex-direction:column;max-width:80%;position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .msg-wrapper.me{align-self:flex-end;align-items:flex-end}
 .msg-wrapper.them{align-self:flex-start;align-items:flex-start}
-/* NEW: Extra space when message has a reaction badge so it doesn't overlap next message */
 .msg-wrapper.has-reaction{margin-bottom:14px}
 .msg{display:inline-block;padding:6px 9px;border-radius:8px;word-wrap:break-word;line-height:1.35;position:relative;cursor:pointer;max-width:100%;font-size:.9rem}
 .msg::after{content:'';display:table;clear:both}
@@ -210,7 +188,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .swipe-reply-indicator{position:absolute;left:-30px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:var(--primary);color:#000;display:flex;justify-content:center;align-items:center;font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .15s ease}
 .msg-wrapper.swiping .swipe-reply-indicator{opacity:1}
 
-/* NEW: Highlight flash when jumping to a replied message */
 @keyframes highlightFlash{
   0%{box-shadow:0 0 0 0 rgba(0,210,255,0)}
   15%{box-shadow:0 0 0 3px var(--primary),0 0 24px rgba(0,210,255,.7)}
@@ -274,29 +251,9 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .info-row .info-value.seen-val{color:var(--tick-blue)}
 .msg-info-card .close-info{width:100%;margin-top:16px;padding:13px;font-size:.86rem;background:var(--surface-light);color:var(--text);box-shadow:none;font-weight:700}
 
-/* REACTION ANIMATION LAYER */
-.reaction-animation-layer{
-  position:absolute;
-  top:0;left:0;right:0;bottom:0;
-  pointer-events:none;
-  z-index:5000;
-  display:none;
-  overflow:hidden;
-  border-radius:var(--radius-lg);
-}
+.reaction-animation-layer{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:5000;display:none;overflow:hidden;border-radius:var(--radius-lg)}
 .reaction-animation-layer.active{display:block}
-.reaction-big-emoji{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%) scale(0);
-  font-size:84px;
-  line-height:1;
-  z-index:10;
-  filter:drop-shadow(0 10px 36px rgba(0,210,255,.6));
-  animation:bigEmojiPop 3s cubic-bezier(.34,1.56,.64,1) forwards;
-  will-change:transform,opacity;
-}
+.reaction-big-emoji{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:84px;line-height:1;z-index:10;filter:drop-shadow(0 10px 36px rgba(0,210,255,.6));animation:bigEmojiPop 3s cubic-bezier(.34,1.56,.64,1) forwards;will-change:transform,opacity}
 @keyframes bigEmojiPop{
   0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-35deg)}
   15%{opacity:1;transform:translate(-50%,-50%) scale(1.45) rotate(10deg)}
@@ -306,38 +263,26 @@ button:disabled{opacity:.4;cursor:not-allowed}
   85%{opacity:1;transform:translate(-50%,-50%) scale(1.02) rotate(2deg)}
   100%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(0deg)}
 }
-.reaction-falling{
-  position:absolute;
-  top:-60px;
-  font-size:22px;
-  line-height:1;
-  will-change:transform,opacity;
-  animation:reactionFall linear forwards;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));
-}
+.reaction-falling{position:absolute;top:-60px;font-size:22px;line-height:1;will-change:transform,opacity;animation:reactionFall linear forwards;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
 @keyframes reactionFall{
   0%{transform:translateY(0) rotate(0deg) scale(.8);opacity:0}
   10%{opacity:1;transform:translateY(10vh) rotate(30deg) scale(1)}
   90%{opacity:.85}
   100%{transform:translateY(110vh) rotate(360deg) scale(1);opacity:0}
 }
-.reaction-glow{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:200px;height:200px;
-  transform:translate(-50%,-50%) scale(0);
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(0,210,255,.5) 0%,transparent 70%);
-  animation:glowExpand 3s ease-out forwards;
-  z-index:1;
-}
+.reaction-glow{position:absolute;left:50%;top:50%;width:200px;height:200px;transform:translate(-50%,-50%) scale(0);border-radius:50%;background:radial-gradient(circle,rgba(0,210,255,.5) 0%,transparent 70%);animation:glowExpand 3s ease-out forwards;z-index:1}
 @keyframes glowExpand{
   0%{transform:translate(-50%,-50%) scale(0);opacity:0}
   15%{transform:translate(-50%,-50%) scale(1);opacity:1}
   70%{opacity:.6}
   100%{transform:translate(-50%,-50%) scale(3);opacity:0}
 }
+
+/* Notification prompt banner */
+.notif-prompt{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#000;padding:12px 18px;border-radius:14px;box-shadow:0 8px 28px rgba(0,210,255,.5);font-size:.82rem;font-weight:700;display:none;align-items:center;gap:10px;z-index:99998;max-width:90%;animation:toastIn .3s ease}
+.notif-prompt.active{display:flex}
+.notif-prompt button{background:rgba(0,0,0,.15);color:#000;padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:800;box-shadow:none;border:none}
+.notif-prompt .notif-close{background:transparent;padding:2px 6px;font-size:1rem;color:rgba(0,0,0,.6);min-width:auto}
 
 @media (min-width:768px){.app-container{max-width:520px;height:90vh}}
 @media (max-width:400px){.top-bar{gap:3px}.turn-indicator{min-width:55px;font-size:.58rem;padding:5px 7px}.reset-btn{width:28px;height:28px;font-size:.75rem}.profile-btn{width:32px;height:32px;font-size:.9rem}}
@@ -348,6 +293,13 @@ button:disabled{opacity:.4;cursor:not-allowed}
 <body>
 
 <div class="toast-container" id="toastContainer"></div>
+
+<div class="notif-prompt" id="notifPrompt">
+    <span>🔔</span>
+    <span style="flex:1">Enable notifications to get alerts for new messages</span>
+    <button id="notifAllowBtn">Allow</button>
+    <button class="notif-close" id="notifCloseBtn">✕</button>
+</div>
 
 <div class="message-action-menu" id="messageActionMenu">
     <div class="reactions-row">
@@ -408,6 +360,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
                     <div class="stat-row"><span class="stat-label">🟡 X Wins</span><span class="stat-value x-color" id="statXWins">0</span></div>
                     <div class="stat-row"><span class="stat-label">🔴 O Wins</span><span class="stat-value o-color" id="statOWins">0</span></div>
                 </div>
+                <div class="profile-menu-divider"></div>
+                <button class="profile-menu-item" id="notifToggleBtn"><span>🔔</span> Enable Notifications</button>
                 <div class="profile-menu-divider"></div>
                 <button class="profile-menu-item danger" id="logoutBtn"><span>🚪</span> Logout</button>
             </div>
@@ -534,6 +488,125 @@ const Utils = {
     generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
 };
 
+/* ============================================================
+   NOTIFICATION MANAGER
+   ============================================================ */
+class NotificationManager {
+    constructor(app) {
+        this.app = app;
+        this.supported = ('Notification' in window);
+        this.lastNotifId = null;
+        this.lastNotifTime = 0;
+        this.notifTimeouts = new Map();
+    }
+    
+    isGranted() {
+        return this.supported && Notification.permission === 'granted';
+    }
+    
+    isDenied() {
+        return this.supported && Notification.permission === 'denied';
+    }
+    
+    async request() {
+        if (!this.supported) {
+            Utils.showToast('Notifications not supported in this browser', 'error', 3000);
+            return false;
+        }
+        if (Notification.permission === 'granted') return true;
+        if (Notification.permission === 'denied') {
+            Utils.showToast('Notifications blocked. Enable from browser settings.', 'warning', 4000);
+            return false;
+        }
+        try {
+            const result = await Notification.requestPermission();
+            if (result === 'granted') {
+                Utils.showToast('🔔 Notifications enabled!', 'success');
+                this.updateToggleButton();
+                return true;
+            } else {
+                Utils.showToast('Notification permission denied', 'warning');
+                return false;
+            }
+        } catch (e) {
+            console.error('Notification request error:', e);
+            return false;
+        }
+    }
+    
+    // Show notification for new incoming message
+    showMessageNotification(sender, message, msgId) {
+        if (!this.isGranted()) return;
+        
+        // Don't show if page is visible AND focused
+        if (document.visibilityState === 'visible' && document.hasFocus()) return;
+        
+        // Throttle: don't show too many notifications for rapid messages
+        const now = Date.now();
+        if (this.lastNotifId === msgId) return;
+        
+        try {
+            const title = sender;
+            const body = message.length > 120 ? message.slice(0, 117) + '...' : message;
+            
+            const notif = new Notification(title, {
+                body: body,
+                tag: 'ttt-msg-' + msgId,
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230b141a"/><text x="50" y="68" font-size="56" text-anchor="middle" fill="%2300d2ff">💬</text></svg>',
+                badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%2300d2ff"/></svg>',
+                requireInteraction: false,
+                silent: false
+            });
+            
+            this.lastNotifId = msgId;
+            this.lastNotifTime = now;
+            
+            notif.onclick = () => {
+                try { window.focus(); } catch (e) {}
+                try { notif.close(); } catch (e) {}
+                // Bring app to foreground - also scroll chat to bottom
+                if (this.app && this.app.els && this.app.els.chatMessages) {
+                    this.app.autoScrollEnabled = true;
+                    requestAnimationFrame(() => {
+                        this.app.els.chatMessages.scrollTop = this.app.els.chatMessages.scrollHeight;
+                    });
+                }
+            };
+            
+            // Auto-close after 8 seconds
+            const timeout = setTimeout(() => {
+                try { notif.close(); } catch (e) {}
+                this.notifTimeouts.delete(msgId);
+            }, 8000);
+            this.notifTimeouts.set(msgId, timeout);
+            
+        } catch (e) {
+            console.error('Notification error:', e);
+        }
+    }
+    
+    updateToggleButton() {
+        const btn = document.getElementById('notifToggleBtn');
+        if (!btn) return;
+        if (!this.supported) {
+            btn.innerHTML = '<span>🔕</span> Not supported';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            return;
+        }
+        if (this.isGranted()) {
+            btn.innerHTML = '<span>🔔</span> Notifications ON';
+            btn.style.color = 'var(--success)';
+        } else if (this.isDenied()) {
+            btn.innerHTML = '<span>🔕</span> Blocked in browser';
+            btn.style.color = 'var(--secondary)';
+        } else {
+            btn.innerHTML = '<span>🔔</span> Enable Notifications';
+            btn.style.color = 'var(--text)';
+        }
+    }
+}
+
 class FirebaseBackend {
     constructor(roomId) {
         this.roomId = roomId;
@@ -568,6 +641,7 @@ class AudioManager {
         this.iceCandidateQueue = [];
         this.remoteDescriptionSet = false;
         this.listenersAttached = false;
+        this.permissionGranted = false;
         this.rtcConfig = { 
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
@@ -581,46 +655,83 @@ class AudioManager {
         };
     }
 
+    isHttpsOrLocalhost() {
+        const loc = window.location;
+        return loc.protocol === 'https:' || loc.hostname === 'localhost' || loc.hostname === '127.0.0.1';
+    }
+
     async prewarmMicrophone() {
         try {
+            if (!this.isHttpsOrLocalhost()) {
+                console.warn('Skipping prewarm: not HTTPS/localhost');
+                return false;
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.warn('getUserMedia not available');
+                return false;
+            }
+            // Don't prompt if already denied
             if (navigator.permissions && navigator.permissions.query) {
                 try {
                     const status = await navigator.permissions.query({ name: 'microphone' });
-                    if (status.state === 'granted') return true;
-                } catch (e) { }
+                    if (status.state === 'denied') {
+                        console.warn('Mic permission is denied');
+                        return false;
+                    }
+                    if (status.state === 'granted') {
+                        this.permissionGranted = true;
+                        return true;
+                    }
+                } catch (e) { /* permission query may not support mic */ }
             }
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
+            // Try simple getUserMedia to prompt
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             stream.getTracks().forEach(t => t.stop());
+            this.permissionGranted = true;
             return true;
         } catch (e) {
-            console.warn('Mic prewarm:', e);
+            console.warn('Mic prewarm failed:', e.name, e.message);
             return false;
         }
     }
 
     async requestPermission() {
         if (this.localStream && this.localStream.active) return true;
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            Utils.showToast('Microphone not supported in this browser/context', 'error', 4000);
-            return false;
+        
+        if (!this.isHttpsOrLocalhost()) {
+            throw { name: 'InsecureContextError', message: 'Microphone requires HTTPS. Open the site via https://' };
         }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw { name: 'NotSupportedError', message: 'Microphone not supported in this browser' };
+        }
+        
+        // Try full constraints first
         try {
             this.localStream = await navigator.mediaDevices.getUserMedia({ 
                 audio: { 
                     echoCancellation: true, 
                     noiseSuppression: true, 
-                    autoGainControl: true,
-                    sampleRate: 48000,
-                    channelCount: 1
+                    autoGainControl: true
                 }, 
                 video: false 
             });
+            this.permissionGranted = true;
             return true;
-        } catch (e) { 
-            console.error('Permission error:', e); 
-            Utils.showToast('Microphone permission denied. Please allow access.', 'error', 4000);
-            return false; 
+        } catch (e1) {
+            console.warn('Full constraints failed (' + e1.name + '), trying simple...');
+            // Try simple constraints
+            try {
+                this.localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.permissionGranted = true;
+                return true;
+            } catch (e2) {
+                console.error('Simple constraints also failed:', e2.name, e2.message);
+                // Throw a detailed error
+                const err = new Error(e2.message);
+                err.name = e2.name || 'Error';
+                err.originalMessage = e2.message;
+                throw err;
+            }
         }
     }
 
@@ -643,15 +754,17 @@ class AudioManager {
     }
 
     async start() {
-        if (this.isAudioOn) return true;
+        if (this.isAudioOn) return { ok: true };
         if (!this.app.opponentName || this.app.opponentName === 'Waiting...') { 
-            Utils.showToast('Waiting for opponent', 'warning'); 
-            return false; 
+            return { ok: false, reason: 'No opponent yet' };
         }
         await this.cleanupPartialState();
         
-        const hasPermission = await this.requestPermission();
-        if (!hasPermission) return false;
+        try {
+            await this.requestPermission();
+        } catch (err) {
+            return { ok: false, error: err };
+        }
         
         this.isAudioOn = true;
         this.sessionId = Utils.generateId();
@@ -667,7 +780,7 @@ class AudioManager {
         this.updateUI(true);
         this.app.addSystemMessage('🎤 Live audio active');
         Utils.vibrate(50);
-        return true;
+        return { ok: true };
     }
 
     setupSignaling() {
@@ -827,7 +940,7 @@ class AudioManager {
 }
 
 const App = {
-    username: '', roomId: '', backend: null, audioManager: null,
+    username: '', roomId: '', backend: null, audioManager: null, notificationManager: null,
     messagesRef: null, messagesListenerUnsub: null,
     playerSymbol: null, opponentName: 'Waiting...', opponentOnline: false,
     isMyTurn: false, board: Array(9).fill(null), gameOver: true,
@@ -843,7 +956,6 @@ const App = {
     lastTouchTs: 0,
     lastRenderedDate: null,
     reactionAnimationTimeout: null,
-    // NEW: double-tap tracking
     lastTapMsgId: null,
     lastTapTime: 0,
     globalSwipe: { active: false, startX: 0, startY: 0, currentX: 0, horizontalSwipe: false, targetWrapper: null, targetMsgId: null, msgData: null, startTime: 0 },
@@ -862,6 +974,7 @@ const App = {
             this.setupGlobalPointerHandlers();
             this.setupOverlayClickHandler();
             this.audioManager = new AudioManager(this);
+            this.notificationManager = new NotificationManager(this);
             this.setupAudioCodeInput();
             this.checkAutoLogin();
             this.handleViewportChange();
@@ -1006,19 +1119,49 @@ const App = {
         const status = this.els.audioStatus;
         if (code === AUDIO_UNLOCK_CODE) {
             if (this.audioManager.isAudioOn) return;
-            if (status) { status.textContent = 'Starting...'; status.classList.remove('error', 'active'); }
-            const success = await this.audioManager.start();
-            if (!success) {
+            if (status) { status.textContent = 'Requesting microphone...'; status.classList.remove('error', 'active'); }
+            
+            const result = await this.audioManager.start();
+            
+            if (!result.ok) {
                 input.classList.add('error');
                 input.value = '';
-                if (status) { status.textContent = 'Failed - check permissions'; status.classList.add('error'); }
+                let msg = 'Failed';
+                const err = result.error;
+                if (result.reason) {
+                    msg = result.reason;
+                } else if (err) {
+                    const name = err.name || '';
+                    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+                        msg = 'Permission denied — allow microphone in browser';
+                    } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+                        msg = 'No microphone found on this device';
+                    } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+                        msg = 'Microphone is in use by another app';
+                    } else if (name === 'NotSupportedError') {
+                        msg = 'Not supported — needs HTTPS';
+                    } else if (name === 'InsecureContextError') {
+                        msg = 'Open site with https:// (not file://)';
+                    } else if (name === 'AbortError') {
+                        msg = 'Microphone access aborted';
+                    } else if (name === 'SecurityError') {
+                        msg = 'Security error — try refreshing';
+                    } else {
+                        msg = 'Failed: ' + (err.message || name || 'unknown');
+                    }
+                }
+                if (status) { status.textContent = msg; status.classList.add('error'); }
+                Utils.showToast(msg, 'error', 4000);
+                
                 setTimeout(() => {
                     input.classList.remove('error');
                     if (status && !this.audioManager.isAudioOn) { 
                         status.textContent = 'Enter 6-digit code'; 
                         status.classList.remove('error', 'active'); 
                     }
-                }, 2500);
+                }, 4000);
+            } else {
+                Utils.showToast('🎤 Microphone active!', 'success', 2000);
             }
         } else {
             input.classList.add('error');
@@ -1098,6 +1241,24 @@ const App = {
             const oppBtn = document.getElementById('starterOppBtn');
             if (meBtn) meBtn.addEventListener('click', (e) => { e.stopPropagation(); this.setNextStarter('me'); });
             if (oppBtn) oppBtn.addEventListener('click', (e) => { e.stopPropagation(); this.setNextStarter('opp'); });
+
+            // Notification toggles
+            const notifToggle = document.getElementById('notifToggleBtn');
+            if (notifToggle) notifToggle.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await this.notificationManager.request();
+                this.notificationManager.updateToggleButton();
+            });
+            
+            const notifAllow = document.getElementById('notifAllowBtn');
+            if (notifAllow) notifAllow.addEventListener('click', async () => {
+                await this.notificationManager.request();
+                document.getElementById('notifPrompt').classList.remove('active');
+            });
+            const notifClose = document.getElementById('notifCloseBtn');
+            if (notifClose) notifClose.addEventListener('click', () => {
+                document.getElementById('notifPrompt').classList.remove('active');
+            });
 
             const closeInfo = document.getElementById('closeInfoBtn');
             if (closeInfo) closeInfo.addEventListener('click', () => document.getElementById('msgInfoModal').classList.remove('active'));
@@ -1194,12 +1355,7 @@ const App = {
             void layer.offsetWidth;
 
             const rainMap = {
-                '❤️': '❤️',
-                '😂': '😂',
-                '👍': '👍',
-                '😮': '😮',
-                '😢': '💧',
-                '😡': '😡'
+                '❤️': '❤️','😂': '😂','👍': '👍','😮': '😮','😢': '💧','😡': '😡'
             };
             const rainEmoji = rainMap[reaction] || reaction;
 
@@ -1391,8 +1547,6 @@ const App = {
             else if (e.type === 'mousedown' && (Date.now() - self.lastTouchTs) < 900) return;
 
             if (!e.target || !e.target.closest) return;
-
-            // NEW: Skip if touch is on reply-quote (it has its own click handler)
             if (e.target.closest('.reply-quote')) return;
 
             const wrapper = e.target.closest('.msg-wrapper');
@@ -1468,7 +1622,6 @@ const App = {
             }
             self.globalLongPress.active = false;
 
-            // NEW: Double-tap detection
             const elapsed = Date.now() - (self.globalSwipe.startTime || 0);
             const wasQuickTap = self.globalSwipe.active && 
                                 !self.globalSwipe.horizontalSwipe && 
@@ -1525,27 +1678,19 @@ const App = {
         });
     },
 
-    /* ============================================================
-       NEW: DOUBLE-TAP → REMOVE REACTION
-       ============================================================ */
     handleDoubleTap(msgId) {
         try {
             const msgData = this.messagesMap[msgId];
             if (!msgData || !msgData.reaction || msgData.deleted) return;
-            // Remove reaction from Firebase
             update(ref(database, `rooms/${this.roomId}/messages/${msgId}`), { 
                 reaction: null, 
                 reactionBy: null 
             });
-            // Update local UI immediately
             this.applyReaction(msgId, null);
             Utils.vibrate(25);
         } catch (e) { console.error('Double tap error:', e); }
     },
 
-    /* ============================================================
-       NEW: SCROLL TO + HIGHLIGHT ORIGINAL REPLY MESSAGE
-       ============================================================ */
     scrollToMessage(msgId) {
         try {
             if (!msgId) return;
@@ -1555,9 +1700,7 @@ const App = {
                 Utils.showToast('Original message not available', 'info', 1500);
                 return;
             }
-            // Smooth scroll into center
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Add highlight flash
             target.classList.remove('highlight-flash');
             void target.offsetWidth;
             target.classList.add('highlight-flash');
@@ -1671,7 +1814,6 @@ const App = {
         } catch (e) {}
     },
 
-    /* UPDATED: Now handles removal (null reaction) + toggles has-reaction class */
     applyReaction(messageId, reaction) {
         try {
             const wrapper = this.els.chatMessages.querySelector(`[data-msg-id="${messageId}"]`);
@@ -1683,14 +1825,12 @@ const App = {
             let badge = msgEl.querySelector('.reaction-badge');
 
             if (!reaction) {
-                // Remove reaction
                 if (badge) badge.remove();
                 wrapper.classList.remove('has-reaction');
                 if (this.messagesMap[messageId]) this.messagesMap[messageId].reaction = null;
                 return;
             }
 
-            // Add / update reaction
             if (!badge) { 
                 badge = document.createElement('div'); 
                 badge.className = 'reaction-badge'; 
@@ -1701,7 +1841,6 @@ const App = {
             if (!this.messagesMap[messageId]) this.messagesMap[messageId] = {};
             this.messagesMap[messageId].reaction = reaction;
 
-            // Animation only if changed to a new reaction
             if (oldReaction !== reaction) {
                 this.playReactionAnimation(reaction);
             }
@@ -1923,6 +2062,20 @@ const App = {
             Utils.showToast(`Joined room ${room} as ${this.playerSymbol}`, 'success');
             this.addSystemMessage(`You joined room ${room} as ${this.playerSymbol}`);
 
+            // Update notification toggle state
+            this.notificationManager.updateToggleButton();
+
+            // Show notification prompt if not yet decided
+            if (this.notificationManager.supported && 
+                Notification.permission === 'default' &&
+                !localStorage.getItem('ttt_notif_prompt_dismissed')) {
+                setTimeout(() => {
+                    const prompt = document.getElementById('notifPrompt');
+                    if (prompt) prompt.classList.add('active');
+                }, 2000);
+            }
+
+            // Prewarm mic (best effort, may fail silently)
             setTimeout(() => { this.audioManager.prewarmMicrophone(); }, 500);
         } catch (error) {
             console.error('Join room error:', error);
@@ -1944,6 +2097,15 @@ const App = {
                     const existing = this.messagesMap[msg.id];
                     if (!existing) {
                         this.renderMessageFromFirebase(msg);
+                        
+                        // Show notification for new incoming messages
+                        if (msg.username !== this.username && !msg.deleted) {
+                            this.notificationManager.showMessageNotification(
+                                msg.username,
+                                msg.message || 'New message',
+                                msg.id
+                            );
+                        }
                     } else {
                         if (msg.deleted && !existing.deleted) this.applyMessageDelete(msg.id);
                         if (msg.status && existing.status !== msg.status) { 
@@ -1952,7 +2114,6 @@ const App = {
                         }
                         if (msg.deliveredAt) existing.deliveredAt = msg.deliveredAt;
                         if (msg.seenAt) existing.seenAt = msg.seenAt;
-                        // UPDATED: handle reaction add, change, AND removal (null)
                         if ((msg.reaction || null) !== (existing.reaction || null)) { 
                             this.applyReaction(msg.id, msg.reaction || null); 
                             existing.reaction = msg.reaction || null; 
@@ -2028,7 +2189,6 @@ const App = {
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${isMe ? 'me' : 'them'}`;
         wrapper.dataset.msgId = msg.id;
-        // NEW: has-reaction class to reserve space for badge
         if (msg.reaction && !isDeleted) wrapper.classList.add('has-reaction');
 
         const swipe = document.createElement('div');
@@ -2053,10 +2213,8 @@ const App = {
             quote.appendChild(qn);
             quote.appendChild(qt);
 
-            // NEW: stop global pointer so tap on quote doesn't start swipe/long-press
             quote.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
             quote.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-            // NEW: click on quote → scroll & highlight original
             quote.addEventListener('click', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
