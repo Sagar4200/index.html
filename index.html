@@ -154,9 +154,29 @@ button:disabled{opacity:.4;cursor:not-allowed}
 @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
 .chat-messages{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:3px;font-size:.9rem;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;min-height:0;background-color:var(--wa-chat-bg);background-image:radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px);background-size:20px 20px;background-position:0 0,10px 10px}
 
+/* DATE SEPARATOR */
+.date-separator{
+  align-self:center;
+  background:rgba(32,44,51,.85);
+  color:var(--text-muted);
+  font-size:.68rem;
+  padding:5px 14px;
+  border-radius:10px;
+  margin:10px 0 6px 0;
+  font-weight:600;
+  letter-spacing:.4px;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+  text-transform:uppercase;
+  flex-shrink:0;
+  animation:dateFade .3s ease;
+}
+@keyframes dateFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
 .msg-wrapper{display:flex;flex-direction:column;max-width:80%;position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .msg-wrapper.me{align-self:flex-end;align-items:flex-end}
 .msg-wrapper.them{align-self:flex-start;align-items:flex-start}
+/* NEW: Extra space when message has a reaction badge so it doesn't overlap next message */
+.msg-wrapper.has-reaction{margin-bottom:14px}
 .msg{display:inline-block;padding:6px 9px;border-radius:8px;word-wrap:break-word;line-height:1.35;position:relative;cursor:pointer;max-width:100%;font-size:.9rem}
 .msg::after{content:'';display:table;clear:both}
 .msg.me{background:var(--wa-outgoing);color:var(--wa-bubble-text);border-bottom-right-radius:2px}
@@ -164,7 +184,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .msg.deleted{opacity:.65;font-style:italic}
 .msg.me.deleted{background:rgba(0,92,75,.4);color:rgba(233,237,239,.6)}
 .msg.them.deleted{background:rgba(32,44,51,.5);color:var(--text-muted)}
-.msg .reply-quote{display:block;padding:4px 7px;margin-bottom:4px;border-left:3px solid var(--tick-blue);background:rgba(0,0,0,.2);border-radius:5px;font-size:.72rem;opacity:.95}
+.msg .reply-quote{display:block;padding:4px 7px;margin-bottom:4px;border-left:3px solid var(--tick-blue);background:rgba(0,0,0,.2);border-radius:5px;font-size:.72rem;opacity:.95;cursor:pointer;transition:background .18s ease}
+.msg .reply-quote:hover,.msg .reply-quote:active{background:rgba(0,0,0,.35)}
 .reply-quote .reply-name{font-weight:700;display:block;margin-bottom:1px;font-size:.65rem;color:#53bdeb}
 .reply-quote .reply-text{opacity:.9;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;color:rgba(233,237,239,.85)}
 .msg .msg-text{display:inline;font-size:.9rem;word-wrap:break-word;overflow-wrap:break-word;white-space:pre-wrap}
@@ -183,15 +204,26 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .msg-status.delivered .tick-2{color:var(--tick-gray);opacity:1}
 .msg-status.seen .tick-1{color:var(--tick-blue);opacity:1}
 .msg-status.seen .tick-2{color:var(--tick-blue);opacity:1}
-.msg .reaction-badge{position:absolute;bottom:-8px;right:8px;background:var(--surface-light);border-radius:10px;padding:1px 5px;font-size:.7rem;border:1px solid var(--border-light);box-shadow:0 1px 4px rgba(0,0,0,.5);display:flex;gap:2px;line-height:1;z-index:3}
+.msg .reaction-badge{position:absolute;bottom:-8px;right:8px;background:var(--surface-light);border-radius:10px;padding:1px 5px;font-size:.7rem;border:1px solid var(--border-light);box-shadow:0 1px 4px rgba(0,0,0,.5);display:flex;gap:2px;line-height:1;z-index:3;animation:reactionPop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes reactionPop{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
 .msg.me .reaction-badge{right:auto;left:8px}
 .swipe-reply-indicator{position:absolute;left:-30px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:var(--primary);color:#000;display:flex;justify-content:center;align-items:center;font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .15s ease}
 .msg-wrapper.swiping .swipe-reply-indicator{opacity:1}
 
+/* NEW: Highlight flash when jumping to a replied message */
+@keyframes highlightFlash{
+  0%{box-shadow:0 0 0 0 rgba(0,210,255,0)}
+  15%{box-shadow:0 0 0 3px var(--primary),0 0 24px rgba(0,210,255,.7)}
+  85%{box-shadow:0 0 0 3px var(--primary),0 0 24px rgba(0,210,255,.7)}
+  100%{box-shadow:0 0 0 0 rgba(0,210,255,0)}
+}
+.msg-wrapper.highlight-flash .msg{animation:highlightFlash 1.6s ease}
+
 .message-action-menu{position:fixed;background:var(--surface-light);border-radius:24px;padding:8px;display:none;flex-direction:column;gap:8px;box-shadow:0 12px 40px rgba(0,0,0,.6);border:1px solid var(--border-light);z-index:9999;min-width:240px}
 .message-action-menu.active{display:flex}
 .message-action-menu .reactions-row{display:flex;gap:4px;justify-content:center;padding:4px 4px 8px 4px;border-bottom:1px solid var(--border)}
-.message-action-menu .reaction-option{font-size:1.5rem;cursor:pointer;padding:4px;border-radius:50%;line-height:1;user-select:none}
+.message-action-menu .reaction-option{font-size:1.5rem;cursor:pointer;padding:4px;border-radius:50%;line-height:1;user-select:none;transition:transform .18s ease,background .18s ease}
+.message-action-menu .reaction-option:hover{transform:scale(1.25);background:rgba(255,255,255,.08)}
 .message-action-menu .action-option{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--text);user-select:none}
 .message-action-menu .action-option:hover{background:rgba(255,255,255,.06)}
 .message-action-menu .action-option.danger{color:var(--secondary)}
@@ -242,6 +274,71 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .info-row .info-value.seen-val{color:var(--tick-blue)}
 .msg-info-card .close-info{width:100%;margin-top:16px;padding:13px;font-size:.86rem;background:var(--surface-light);color:var(--text);box-shadow:none;font-weight:700}
 
+/* REACTION ANIMATION LAYER */
+.reaction-animation-layer{
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  pointer-events:none;
+  z-index:5000;
+  display:none;
+  overflow:hidden;
+  border-radius:var(--radius-lg);
+}
+.reaction-animation-layer.active{display:block}
+.reaction-big-emoji{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-size:84px;
+  line-height:1;
+  z-index:10;
+  filter:drop-shadow(0 10px 36px rgba(0,210,255,.6));
+  animation:bigEmojiPop 3s cubic-bezier(.34,1.56,.64,1) forwards;
+  will-change:transform,opacity;
+}
+@keyframes bigEmojiPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-35deg)}
+  15%{opacity:1;transform:translate(-50%,-50%) scale(1.45) rotate(10deg)}
+  30%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  55%{transform:translate(-50%,-50%) scale(1.08) rotate(-3deg)}
+  70%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  85%{opacity:1;transform:translate(-50%,-50%) scale(1.02) rotate(2deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(0deg)}
+}
+.reaction-falling{
+  position:absolute;
+  top:-60px;
+  font-size:22px;
+  line-height:1;
+  will-change:transform,opacity;
+  animation:reactionFall linear forwards;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));
+}
+@keyframes reactionFall{
+  0%{transform:translateY(0) rotate(0deg) scale(.8);opacity:0}
+  10%{opacity:1;transform:translateY(10vh) rotate(30deg) scale(1)}
+  90%{opacity:.85}
+  100%{transform:translateY(110vh) rotate(360deg) scale(1);opacity:0}
+}
+.reaction-glow{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:200px;height:200px;
+  transform:translate(-50%,-50%) scale(0);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,210,255,.5) 0%,transparent 70%);
+  animation:glowExpand 3s ease-out forwards;
+  z-index:1;
+}
+@keyframes glowExpand{
+  0%{transform:translate(-50%,-50%) scale(0);opacity:0}
+  15%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  70%{opacity:.6}
+  100%{transform:translate(-50%,-50%) scale(3);opacity:0}
+}
+
 @media (min-width:768px){.app-container{max-width:520px;height:90vh}}
 @media (max-width:400px){.top-bar{gap:3px}.turn-indicator{min-width:55px;font-size:.58rem;padding:5px 7px}.reset-btn{width:28px;height:28px;font-size:.75rem}.profile-btn{width:32px;height:32px;font-size:.9rem}}
 @media (max-height:600px){.chat-panel{min-height:120px}.game-panel{min-height:100px}}
@@ -270,6 +367,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 </div>
 
 <div class="app-container" id="app">
+    <div class="reaction-animation-layer" id="reactionLayer"></div>
+
     <div class="top-bar" id="topBar" style="display:none;">
         <div class="profile-container">
             <button class="profile-btn" id="profileBtn">👤<span class="online-dot offline" id="myOnlineDot"></span></button>
@@ -403,7 +502,6 @@ const AUDIO_UNLOCK_CODE = "741501";
 
 const TICK_SVG = '<svg viewBox="0 0 16 11" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M11.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-2.405-2.272a.463.463 0 0 0-.336-.146.47.47 0 0 0-.343.146l-.311.31a.445.445 0 0 0-.14.337c0 .136.047.25.14.343l2.996 2.996a.724.724 0 0 0 .501.193.697.697 0 0 0 .547-.29l6.816-8.358a.438.438 0 0 0 .106-.291.462.462 0 0 0-.152-.336L11.07.653z"/></svg>';
 
-// FIX: Track user interaction for vibration API
 let userInteracted = false;
 document.addEventListener('touchstart', () => { userInteracted = true; }, { once: true, passive: true });
 document.addEventListener('mousedown', () => { userInteracted = true; }, { once: true });
@@ -428,7 +526,6 @@ const Utils = {
         container.appendChild(toast);
         setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, duration);
     },
-    // FIX: Only vibrate if user has interacted
     vibrate(p = 30) { 
         if (!userInteracted) return;
         try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} 
@@ -490,12 +587,9 @@ class AudioManager {
                 try {
                     const status = await navigator.permissions.query({ name: 'microphone' });
                     if (status.state === 'granted') return true;
-                } catch (e) { /* not supported */ }
+                } catch (e) { }
             }
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                console.warn('getUserMedia not supported in this context');
-                return false;
-            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             stream.getTracks().forEach(t => t.stop());
             return true;
@@ -554,13 +648,11 @@ class AudioManager {
             Utils.showToast('Waiting for opponent', 'warning'); 
             return false; 
         }
-        // Clean up any stale state before starting
         await this.cleanupPartialState();
         
         const hasPermission = await this.requestPermission();
-        if (!hasPermission) { 
-            return false; 
-        }
+        if (!hasPermission) return false;
+        
         this.isAudioOn = true;
         this.sessionId = Utils.generateId();
         const names = [this.app.username, this.app.opponentName].sort();
@@ -749,7 +841,12 @@ const App = {
     gamePanelRatio: 0.5, isDragging: false, dragStartY: 0, dragStartGameHeight: 0,
     dragStartChatHeight: 0, dragRafId: null, minGameHeight: 120, minChatHeight: 140,
     lastTouchTs: 0,
-    globalSwipe: { active: false, startX: 0, startY: 0, currentX: 0, horizontalSwipe: false, targetWrapper: null, targetMsgId: null, msgData: null },
+    lastRenderedDate: null,
+    reactionAnimationTimeout: null,
+    // NEW: double-tap tracking
+    lastTapMsgId: null,
+    lastTapTime: 0,
+    globalSwipe: { active: false, startX: 0, startY: 0, currentX: 0, horizontalSwipe: false, targetWrapper: null, targetMsgId: null, msgData: null, startTime: 0 },
     globalLongPress: { active: false, timer: null, targetMsgId: null, isMyMessage: false, startX: 0, startY: 0 },
     els: {},
 
@@ -846,7 +943,8 @@ const App = {
             profileOpponentDot: document.getElementById('profileOpponentDot'),
             audioIndicator: document.getElementById('audioIndicator'),
             audioCodeInput: document.getElementById('audioCodeInput'),
-            audioStatus: document.getElementById('audioStatus')
+            audioStatus: document.getElementById('audioStatus'),
+            reactionLayer: document.getElementById('reactionLayer')
         };
     },
 
@@ -856,6 +954,7 @@ const App = {
             if (this.remoteTypingTimeout) clearTimeout(this.remoteTypingTimeout);
             if (this.globalLongPress.timer) clearTimeout(this.globalLongPress.timer);
             if (this.dragRafId) cancelAnimationFrame(this.dragRafId);
+            if (this.reactionAnimationTimeout) clearTimeout(this.reactionAnimationTimeout);
             if (this.isTyping && this.backend) this.backend.send('typing', { username: this.username, typing: false });
             if (this.messagesListenerUnsub) { try { this.messagesListenerUnsub(); } catch (e) {} this.messagesListenerUnsub = null; }
             if (this.audioManager) this.audioManager.stop(false);
@@ -1063,6 +1162,78 @@ const App = {
         } catch (e) {} 
     },
 
+    getDateLabel(timestamp) {
+        if (!timestamp) return 'Today';
+        const d = new Date(timestamp);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        if (msgDay.getTime() === today.getTime()) return 'Today';
+        if (msgDay.getTime() === yesterday.getTime()) return 'Yesterday';
+
+        const day = d.getDate().toString().padStart(2, '0');
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    },
+
+    playReactionAnimation(reaction) {
+        try {
+            const layer = this.els.reactionLayer;
+            if (!layer) return;
+
+            if (this.reactionAnimationTimeout) {
+                clearTimeout(this.reactionAnimationTimeout);
+                this.reactionAnimationTimeout = null;
+            }
+            layer.classList.remove('active');
+            layer.innerHTML = '';
+            void layer.offsetWidth;
+
+            const rainMap = {
+                '❤️': '❤️',
+                '😂': '😂',
+                '👍': '👍',
+                '😮': '😮',
+                '😢': '💧',
+                '😡': '😡'
+            };
+            const rainEmoji = rainMap[reaction] || reaction;
+
+            const glow = document.createElement('div');
+            glow.className = 'reaction-glow';
+            layer.appendChild(glow);
+
+            const bigEmoji = document.createElement('div');
+            bigEmoji.className = 'reaction-big-emoji';
+            bigEmoji.textContent = reaction;
+            layer.appendChild(bigEmoji);
+
+            const dropCount = 60;
+            for (let i = 0; i < dropCount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'reaction-falling';
+                drop.textContent = rainEmoji;
+                drop.style.left = (Math.random() * 96) + '%';
+                drop.style.animationDelay = (Math.random() * 1.3) + 's';
+                drop.style.animationDuration = (1.4 + Math.random() * 1.0) + 's';
+                drop.style.fontSize = (14 + Math.random() * 22) + 'px';
+                layer.appendChild(drop);
+            }
+
+            layer.classList.add('active');
+
+            this.reactionAnimationTimeout = setTimeout(() => {
+                layer.classList.remove('active');
+                layer.innerHTML = '';
+                this.reactionAnimationTimeout = null;
+            }, 3200);
+        } catch (e) { console.error('Reaction animation error:', e); }
+    },
+
     renderOverlay(state, opts = {}) {
         const overlay = this.els.boardOverlay;
         if (!overlay) return;
@@ -1220,6 +1391,10 @@ const App = {
             else if (e.type === 'mousedown' && (Date.now() - self.lastTouchTs) < 900) return;
 
             if (!e.target || !e.target.closest) return;
+
+            // NEW: Skip if touch is on reply-quote (it has its own click handler)
+            if (e.target.closest('.reply-quote')) return;
+
             const wrapper = e.target.closest('.msg-wrapper');
             if (!wrapper) return;
             const msgId = wrapper.dataset.msgId;
@@ -1236,6 +1411,7 @@ const App = {
             self.globalSwipe.targetWrapper = wrapper;
             self.globalSwipe.targetMsgId = msgId;
             self.globalSwipe.msgData = msgData;
+            self.globalSwipe.startTime = Date.now();
 
             self.globalLongPress.active = true;
             self.globalLongPress.startX = sX; self.globalLongPress.startY = sY;
@@ -1250,6 +1426,7 @@ const App = {
                     self.globalLongPress.active = false;
                     self.globalSwipe.active = false;
                     self.globalSwipe.targetWrapper = null;
+                    self.globalSwipe.targetMsgId = null;
                 }
             }, 500);
         };
@@ -1290,6 +1467,31 @@ const App = {
                 self.globalLongPress.timer = null; 
             }
             self.globalLongPress.active = false;
+
+            // NEW: Double-tap detection
+            const elapsed = Date.now() - (self.globalSwipe.startTime || 0);
+            const wasQuickTap = self.globalSwipe.active && 
+                                !self.globalSwipe.horizontalSwipe && 
+                                self.globalSwipe.targetMsgId &&
+                                Math.abs(self.globalSwipe.currentX) < 5 &&
+                                elapsed < 350;
+
+            if (wasQuickTap) {
+                const now = Date.now();
+                const msgId = self.globalSwipe.targetMsgId;
+                if (self.lastTapMsgId === msgId && (now - self.lastTapTime) < 320) {
+                    self.handleDoubleTap(msgId);
+                    self.lastTapMsgId = null;
+                    self.lastTapTime = 0;
+                } else {
+                    self.lastTapMsgId = msgId;
+                    self.lastTapTime = now;
+                }
+            } else {
+                self.lastTapMsgId = null;
+                self.lastTapTime = 0;
+            }
+
             if (self.globalSwipe.active && self.globalSwipe.targetWrapper) {
                 const wrapper = self.globalSwipe.targetWrapper;
                 if (self.globalSwipe.horizontalSwipe && Math.abs(self.globalSwipe.currentX) > 60 && self.globalSwipe.msgData && !self.globalSwipe.msgData.deleted) {
@@ -1321,6 +1523,49 @@ const App = {
             document.removeEventListener('mousemove', handleMove);
             document.removeEventListener('mouseup', handleUp);
         });
+    },
+
+    /* ============================================================
+       NEW: DOUBLE-TAP → REMOVE REACTION
+       ============================================================ */
+    handleDoubleTap(msgId) {
+        try {
+            const msgData = this.messagesMap[msgId];
+            if (!msgData || !msgData.reaction || msgData.deleted) return;
+            // Remove reaction from Firebase
+            update(ref(database, `rooms/${this.roomId}/messages/${msgId}`), { 
+                reaction: null, 
+                reactionBy: null 
+            });
+            // Update local UI immediately
+            this.applyReaction(msgId, null);
+            Utils.vibrate(25);
+        } catch (e) { console.error('Double tap error:', e); }
+    },
+
+    /* ============================================================
+       NEW: SCROLL TO + HIGHLIGHT ORIGINAL REPLY MESSAGE
+       ============================================================ */
+    scrollToMessage(msgId) {
+        try {
+            if (!msgId) return;
+            const container = this.els.chatMessages;
+            const target = container.querySelector(`[data-msg-id="${msgId}"]`);
+            if (!target) {
+                Utils.showToast('Original message not available', 'info', 1500);
+                return;
+            }
+            // Smooth scroll into center
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Add highlight flash
+            target.classList.remove('highlight-flash');
+            void target.offsetWidth;
+            target.classList.add('highlight-flash');
+            setTimeout(() => {
+                if (target) target.classList.remove('highlight-flash');
+            }, 1700);
+            Utils.vibrate(15);
+        } catch (e) { console.error('Scroll to message error:', e); }
     },
 
     setupActionMenu() {
@@ -1356,7 +1601,7 @@ const App = {
             const del = document.getElementById('deleteMsgOption');
             const info = document.getElementById('infoMsgOption');
             if (del) del.style.display = isMy ? 'flex' : 'none';
-            if (info) info.style.display = isMy ? 'flex' : 'none';
+            if (info) info.style.display = 'flex';
 
             const x = e.clientX || 0, y = e.clientY || 0;
             menu.style.position = 'fixed';
@@ -1426,21 +1671,40 @@ const App = {
         } catch (e) {}
     },
 
+    /* UPDATED: Now handles removal (null reaction) + toggles has-reaction class */
     applyReaction(messageId, reaction) {
         try {
             const wrapper = this.els.chatMessages.querySelector(`[data-msg-id="${messageId}"]`);
             if (!wrapper) return;
             const msgEl = wrapper.querySelector('.msg');
             if (!msgEl) return;
+            const oldReaction = this.messagesMap[messageId] ? this.messagesMap[messageId].reaction : undefined;
+
             let badge = msgEl.querySelector('.reaction-badge');
+
+            if (!reaction) {
+                // Remove reaction
+                if (badge) badge.remove();
+                wrapper.classList.remove('has-reaction');
+                if (this.messagesMap[messageId]) this.messagesMap[messageId].reaction = null;
+                return;
+            }
+
+            // Add / update reaction
             if (!badge) { 
                 badge = document.createElement('div'); 
                 badge.className = 'reaction-badge'; 
                 msgEl.appendChild(badge); 
             }
             badge.textContent = reaction;
+            wrapper.classList.add('has-reaction');
             if (!this.messagesMap[messageId]) this.messagesMap[messageId] = {};
             this.messagesMap[messageId].reaction = reaction;
+
+            // Animation only if changed to a new reaction
+            if (oldReaction !== reaction) {
+                this.playReactionAnimation(reaction);
+            }
         } catch (e) {}
     },
 
@@ -1470,6 +1734,7 @@ const App = {
             const msgData = this.messagesMap[messageId] || {};
             msgEl.innerHTML = '';
             msgEl.classList.add('deleted');
+            wrapper.classList.remove('has-reaction');
             const notice = document.createElement('span');
             notice.className = 'msg-text';
             notice.textContent = '🚫 This message was deleted';
@@ -1484,6 +1749,7 @@ const App = {
             if (!this.messagesMap[messageId]) this.messagesMap[messageId] = {};
             this.messagesMap[messageId].deleted = true;
             this.messagesMap[messageId].text = 'This message was deleted';
+            this.messagesMap[messageId].reaction = null;
         } catch (e) {}
     },
 
@@ -1584,6 +1850,7 @@ const App = {
             this.roomId = room;
             this.backend = new FirebaseBackend(room);
             this.messagesRef = ref(database, `rooms/${room}/messages`);
+            this.lastRenderedDate = null;
 
             const playersRef = ref(database, `rooms/${room}/players`);
             const snapshot = await get(playersRef);
@@ -1656,7 +1923,6 @@ const App = {
             Utils.showToast(`Joined room ${room} as ${this.playerSymbol}`, 'success');
             this.addSystemMessage(`You joined room ${room} as ${this.playerSymbol}`);
 
-            // Prewarm microphone permission in background
             setTimeout(() => { this.audioManager.prewarmMicrophone(); }, 500);
         } catch (error) {
             console.error('Join room error:', error);
@@ -1686,9 +1952,10 @@ const App = {
                         }
                         if (msg.deliveredAt) existing.deliveredAt = msg.deliveredAt;
                         if (msg.seenAt) existing.seenAt = msg.seenAt;
-                        if (msg.reaction && existing.reaction !== msg.reaction) { 
-                            this.applyReaction(msg.id, msg.reaction); 
-                            existing.reaction = msg.reaction; 
+                        // UPDATED: handle reaction add, change, AND removal (null)
+                        if ((msg.reaction || null) !== (existing.reaction || null)) { 
+                            this.applyReaction(msg.id, msg.reaction || null); 
+                            existing.reaction = msg.reaction || null; 
                         }
                     }
                     if (msg.username !== this.username && msg.status === 'sent' && !this.deliveredMarked.has(msg.id)) {
@@ -1719,10 +1986,21 @@ const App = {
                 replyTo: msg.replyTo,
                 deleted: !!msg.deleted,
                 status: msg.status || 'sent',
-                reaction: msg.reaction,
+                reaction: msg.reaction || null,
                 deliveredAt: msg.deliveredAt || null,
                 seenAt: msg.seenAt || null
             };
+
+            const msgDate = this.getDateLabel(msg.timestamp || Date.now());
+            if (this.lastRenderedDate !== msgDate) {
+                const sep = document.createElement('div');
+                sep.className = 'date-separator';
+                sep.textContent = msgDate;
+                sep.dataset.date = msgDate;
+                container.appendChild(sep);
+                this.lastRenderedDate = msgDate;
+            }
+
             const wrapper = this.createMessageElement(msg);
             container.appendChild(wrapper);
             if (this.autoScrollEnabled) requestAnimationFrame(() => { 
@@ -1750,6 +2028,8 @@ const App = {
         const wrapper = document.createElement('div');
         wrapper.className = `msg-wrapper ${isMe ? 'me' : 'them'}`;
         wrapper.dataset.msgId = msg.id;
+        // NEW: has-reaction class to reserve space for badge
+        if (msg.reaction && !isDeleted) wrapper.classList.add('has-reaction');
 
         const swipe = document.createElement('div');
         swipe.className = 'swipe-reply-indicator';
@@ -1762,6 +2042,8 @@ const App = {
         if (msg.replyTo && !isDeleted) {
             const quote = document.createElement('div');
             quote.className = 'reply-quote';
+            quote.dataset.replyToId = msg.replyTo.id;
+
             const qn = document.createElement('span');
             qn.className = 'reply-name';
             qn.textContent = msg.replyTo.name;
@@ -1770,6 +2052,17 @@ const App = {
             qt.textContent = msg.replyTo.text;
             quote.appendChild(qn);
             quote.appendChild(qt);
+
+            // NEW: stop global pointer so tap on quote doesn't start swipe/long-press
+            quote.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+            quote.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            // NEW: click on quote → scroll & highlight original
+            quote.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                this.scrollToMessage(msg.replyTo.id);
+            });
+
             msgDiv.appendChild(quote);
         }
 
